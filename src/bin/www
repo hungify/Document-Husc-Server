@@ -4,16 +4,15 @@
  * Module dependencies.
  */
 
-var app = require("../app");
+var app = require("../server.js");
 var debug = require("debug")("server:server");
 var http = require("http");
-require("dotenv").config();
-
+var envConfig = require("../configs/env.config");
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || process.env.APP_PORT || "8080");
+var port = normalizePort(envConfig.port || envConfig.appPort || "8080");
 app.set("port", port);
 
 /**
