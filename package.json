@@ -2,6 +2,7 @@
   "name": "server",
   "version": "0.0.1",
   "private": true,
+  "type": "commonjs",
   "scripts": {
     "start": "nodemon ./src/bin/www"
   },
