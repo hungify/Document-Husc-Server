@@ -1,24 +1,27 @@
 const createError = require("http-errors");
 const express = require("express");
-const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
-
-const indexRouter = require("./routes/index");
+const helmet = require("helmet");
+const cors = require("cors");
+require("dotenv").config();
 
 const app = express();
 
-// view engine setup
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "ejs");
-
+app.use(helmet());
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/", indexRouter);
+app.use(cors(require("./configs/cors.config")));
+app.use("/api/v1", require("./routes"));
+
+app.get("/", (req, res, next) => {
+  return res.status(200).json({
+    message: "The API Server is running!. Redirect to /api/v1 to see the API endpoints.",
+  });
+});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -33,7 +36,9 @@ app.use(function (err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render("error");
+  res.json({
+    message: err.message,
+  });
 });
 
 module.exports = app;
