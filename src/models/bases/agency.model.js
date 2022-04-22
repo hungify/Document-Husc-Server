@@ -11,6 +11,7 @@ const agencySchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  timestamps: true,
 });
 
 const AgencyDocument = connectToMongoLocal.model('Agencies', agencySchema);

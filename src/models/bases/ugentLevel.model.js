@@ -24,6 +24,7 @@ const urgentLevelSchema = new mongoose.Schema({
     enum: COLORS_ENUM,
     required: true,
   },
+  timestamps: true,
 });
 
 const UrgentLevel = connectToMongoLocal.model('UrgentLevel', urgentLevelSchema);
