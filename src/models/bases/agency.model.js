@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const connectToMongoLocal = require('../configs/connectDB');
+const connectToMongoLocal = require('../../configs/db.config');
 
 const agencySchema = new mongoose.Schema({
   value: {
@@ -13,9 +13,6 @@ const agencySchema = new mongoose.Schema({
   },
 });
 
-const AgencyDocument = connectToMongoLocal.model(
-  'Agencies',
-  agencyDocumentSchema
-);
+const AgencyDocument = connectToMongoLocal.model('Agencies', agencySchema);
 
 module.exports = AgencyDocument;
