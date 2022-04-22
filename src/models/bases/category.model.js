@@ -1,18 +1,20 @@
 const mongoose = require('mongoose');
 const connectToMongoLocal = require('../../configs/db.config');
 
-const categorySchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
-    unique: true,
+const categorySchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    parentId: {
+      type: String,
+      default: null,
+    },
   },
-  parentId: {
-    type: String,
-    default: null,
-  },
-  timestamps: true,
-});
+  { timestamps: true }
+);
 
 const CategoryDocument = connectToMongoLocal.model(
   'Categories',
