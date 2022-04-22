@@ -1,0 +1,69 @@
+const CreateError = require('http-errors');
+const { UrgentLevel } = require('../models/bases/ugentLevel.model');
+
+const createUrgentLevel = async (req, res, next) => {
+  try {
+    const { label, colorTag } = req.body;
+    const foundUrgentLevel = await UrgentLevel.findOne({ label });
+    if (foundUrgentLevel) {
+      throw CreateError.Conflict(
+        `UrgentLevel with value "${label}" already exists`
+      );
+    }
+    const value = label;
+    const newUrgentLevel = new UrgentLevel({ label, value, colorTag });
+    const savedUrgentLevel = await newUrgentLevel.save();
+    return res.status(201).json(savedUrgentLevel);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateUrgentLevel = async (req, res, next) => {
+  try {
+    const { label, colorTag } = req.body;
+    const { urgentLevelId } = req.params;
+
+    const foundUrgentLevel = await UrgentLevel.findById(urgentLevelId);
+    if (!foundUrgentLevel) {
+      throw CreateError.NotFound(
+        `UrgentLevel with id "${urgentLevelId}" not found`
+      );
+    }
+
+    const foundUrgentLevelWithSameLabel = await UrgentLevel.findOne({ label });
+    if (
+      foundUrgentLevelWithSameLabel &&
+      foundUrgentLevelWithSameLabel._id !== urgentLevelId
+    ) {
+      throw CreateError.Conflict(
+        `UrgentLevel with value "${label}" already exists`
+      );
+    }
+
+    const value = label;
+    const updatedUrgentLevel = await UrgentLevel.findByIdAndUpdate(
+      urgentLevelId,
+      { label, value, colorTag },
+      { new: true }
+    );
+    return res.status(200).json(updatedUrgentLevel);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getAllUrgentLevels = async (req, res, next) => {
+  try {
+    const foundUrgentLevels = await UrgentLevel.find({});
+    return res.status(200).json(foundUrgentLevels);
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  createUrgentLevel,
+  updateUrgentLevel,
+  getAllUrgentLevels,
+};
