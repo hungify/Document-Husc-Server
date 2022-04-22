@@ -1,0 +1,274 @@
+{
+	"info": {
+		"_postman_id": "89bd47bd-ea3a-4f7a-93b0-d2853765d239",
+		"name": "Manage Document",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Agencies",
+			"item": [
+				{
+					"name": "[Agency]: Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"label\": \"Đại Học Huế 1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/agencies",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agencies"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[Agency]: Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"label\": \"Đại Học Huế update\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/agencies/62616c61e6b7e844e937c310",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agencies",
+								"62616c61e6b7e844e937c310"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Categories",
+			"item": [
+				{
+					"name": "[Category]: Get All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/categories",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[Category]: Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Khoa học công nghệ 3\",\n    \"parentId\": \"62616d3ce6b7e844e937c331\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/categories",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[Category]: Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Đại Học Khoa Học Huế 2\",\n    \"parentId\": \"62616d3ce6b7e844e937c331\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/categories/62616d23e6b7e844e937c32b",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories",
+								"62616d23e6b7e844e937c32b"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "TypesOfCategory",
+			"item": [
+				{
+					"name": "[TypeOfCategory]: Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"label\": \"Quyết định\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/types-of-documents",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"types-of-documents"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[TypeOfCategory]: Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"label\": \"Thông báo\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/types-of-documents/6261842b0be471e611e1afe6",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"types-of-documents",
+								"6261842b0be471e611e1afe6"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[TypeOfCategory]: Get All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/types-of-documents",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"types-of-documents"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "UrgentLevel",
+			"item": [
+				{
+					"name": "[UrgentLevel]: Get All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/urgent-levels",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"urgent-levels"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[UrgentLevel]: Create",
+					"request": {
+						"method": "POST",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "[UrgentLeve]: Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \n    \"colorTag\": \"yellow\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/urgent-levels/62618f63d65ee55bcb9554da",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"urgent-levels",
+								"62618f63d65ee55bcb9554da"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
