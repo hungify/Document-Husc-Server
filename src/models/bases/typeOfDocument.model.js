@@ -11,6 +11,7 @@ const typesOfDocumentsSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  timestamps: true,
 });
 
 const TypeOfDocument = connectToMongoLocal.model(
