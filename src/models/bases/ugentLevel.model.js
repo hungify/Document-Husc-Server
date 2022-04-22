@@ -1,11 +1,19 @@
 const mongoose = require('mongoose');
-const connectToMongoLocal = require('../configs/connectDB');
+const connectToMongoLocal = require('../../configs/db.config');
+const COLORS_ENUM = [
+  'red',
+  'orange',
+  'yellow',
+  'green',
+  'blue',
+  'purple',
+  'pink',
+];
 
 const urgentLevelSchema = new mongoose.Schema({
   value: {
     type: String,
     required: true,
-    unique: true,
   },
   label: {
     type: String,
@@ -13,8 +21,14 @@ const urgentLevelSchema = new mongoose.Schema({
   },
   colorTag: {
     type: String,
-    enum: ['red', 'green'],
+    enum: COLORS_ENUM,
+    required: true,
   },
 });
 
 const UrgentLevel = connectToMongoLocal.model('UrgentLevel', urgentLevelSchema);
+
+module.exports = {
+  UrgentLevel,
+  COLORS_ENUM,
+};
