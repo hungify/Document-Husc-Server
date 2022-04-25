@@ -1,9 +1,11 @@
 const express = require('express');
-const usersRouter = require('./users');
-const agencyRoute = require('./agency.route');
-const categoryRoute = require('./category.route');
-const urgentLevelRoute = require('./urgentLevel.route');
-const typesOfDocumentRoute = require('./typesOfDocuments.route');
+const authRouter = require('./auth');
+const agenciesRoute = require('./agencies.route');
+const categoriesRoute = require('./categories.route');
+const urgentLevelsRoute = require('./urgentLevels.route');
+const typesOfDocumentsRoute = require('./typeOfDocuments.route');
+const documentsRoute = require('./documents.route');
+const usersRoute = require('./user.route');
 
 const router = express.Router();
 
@@ -13,14 +15,18 @@ router.get('/', (req, res) => {
   });
 });
 
-router.use('/users', usersRouter);
+router.use('/auth', authRouter);
 
-router.use('/agencies', agencyRoute);
+router.use('/users', usersRoute);
 
-router.use('/categories', categoryRoute);
+router.use('/agencies', agenciesRoute);
 
-router.use('/urgent-levels', urgentLevelRoute);
+router.use('/categories', categoriesRoute);
 
-router.use('/types-of-documents', typesOfDocumentRoute);
+router.use('/urgent-levels', urgentLevelsRoute);
+
+router.use('/types-of-documents', typesOfDocumentsRoute);
+
+router.use('/documents', documentsRoute);
 
 module.exports = router;

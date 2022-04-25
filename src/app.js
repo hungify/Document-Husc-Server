@@ -4,10 +4,13 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const helmet = require('helmet');
 const cors = require('cors');
+// const apicache = require('apicache');
 const connectToMongoLocal = require('./configs/db.config');
 
 const bootServer = () => {
   const app = express();
+  // const cache = apicache.middleware;
+  // app.use(cache('5 minutes'));
   app.use(helmet());
   app.use(logger('dev'));
   app.use(express.json());
