@@ -1,5 +1,5 @@
 const CreateError = require('http-errors');
-const { UrgentLevel } = require('../models/bases/ugentLevel.model');
+const { UrgentLevel } = require('../models/ugentLevel.model');
 
 const createUrgentLevel = async (req, res, next) => {
   try {

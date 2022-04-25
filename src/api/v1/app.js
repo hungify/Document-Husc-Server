@@ -5,7 +5,7 @@ const logger = require('morgan');
 const helmet = require('helmet');
 const cors = require('cors');
 // const apicache = require('apicache');
-const connectToMongoLocal = require('./configs/db.config');
+const connectToMongoLocal = require('../../configs/db.config');
 
 const bootServer = () => {
   const app = express();
@@ -17,7 +17,7 @@ const bootServer = () => {
   app.use(express.urlencoded({ extended: false }));
   app.use(cookieParser());
 
-  app.use(cors(require('./configs/cors.config')));
+  app.use(cors(require('../../configs/cors.config')));
   app.use('/api/v1', require('./routes'));
 
   app.get('/', (req, res, next) => {

@@ -1,10 +1,10 @@
 const CreateError = require('http-errors');
 const Document = require('../models/document.model');
-const TypeOfDocument = require('../models/bases/typeOfDocument.model');
-const Agency = require('../models/bases/agency.model');
-const Category = require('../models/bases/category.model');
+const TypeOfDocument = require('../models/typeOfDocument.model');
+const Agency = require('../models/agency.model');
+const Category = require('../models/category.model');
 const User = require('../models/user.model');
-const { UrgentLevel } = require('../models/bases/ugentLevel.model');
+const { UrgentLevel } = require('../models/ugentLevel.model');
 const APICore = require('../libs/apiCore');
 
 const createDocument = async (req, res, next) => {
