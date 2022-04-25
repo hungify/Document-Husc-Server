@@ -21,8 +21,13 @@ const createCategory = async (req, res, next) => {
         );
       }
     }
-
-    const newCategory = new Category({ title, parentId });
+    const value = title
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[đĐ]/g, (m) => (m === 'đ' ? 'd' : 'D'))
+      .replace(/\s/g, '-');
+    const newCategory = new Category({ title, value, parentId });
     const savedCategory = await newCategory.save();
 
     return res.status(201).json(savedCategory);
