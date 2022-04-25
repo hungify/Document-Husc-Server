@@ -8,8 +8,13 @@ const categorySchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    parentId: {
+    value: {
       type: String,
+      required: true,
+      unique: true,
+    },
+    parentId: {
+      type: mongoose.Schema.Types.ObjectId,
       default: null,
     },
   },
