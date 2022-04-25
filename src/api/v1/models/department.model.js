@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const connectToMongoLocal = require('../configs/connectDB');
+const connectToMongoLocal = require('../../../configs/db.config');
 
 const departmentSchema = new mongoose.Schema({
   key: {

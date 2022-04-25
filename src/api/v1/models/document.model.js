@@ -1,5 +1,5 @@
-const connectToMongoLocal = require('../configs/db.config');
 const mongoose = require('mongoose');
+const connectToMongoLocal = require('../../../configs/db.config');
 
 const documentSchema = new mongoose.Schema(
   {
