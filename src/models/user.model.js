@@ -1,34 +1,38 @@
-const connectToMongoLocal = require('../configs/connectDB');
+const connectToMongoLocal = require('../configs/db.config');
 const mongoose = require('mongoose');
 const bcryptjs = require('bcryptjs');
 
-const userSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    required: true,
-    unique: true,
+const userSchema = new mongoose.Schema(
+  {
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    avatar: {
+      type: String,
+      default: '',
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    role: {
+      type: String,
+      enum: ['admin', 'user'],
+      default: 'user',
+    },
   },
-  avatar: {
-    type: String,
-    default: '',
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-  role: {
-    type: String,
-    enum: ['admin', 'user'],
-    default: 'user',
-  },
-  timestamps: true,
-});
+  {
+    timestamps: true,
+  }
+);
 
 userSchema.pre('save', async function (next) {
   try {
