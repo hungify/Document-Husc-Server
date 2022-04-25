@@ -1,6 +1,6 @@
-const connectToMongoLocal = require('../configs/db.config');
 const mongoose = require('mongoose');
 const bcryptjs = require('bcryptjs');
+const connectToMongoLocal = require('../../../configs/db.config');
 
 const userSchema = new mongoose.Schema(
   {
