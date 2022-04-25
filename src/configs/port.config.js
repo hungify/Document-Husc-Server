@@ -1,39 +1,4 @@
-#!/usr/bin/env node
-
-/**
- * Module dependencies.
- */
-
-var app = require('../app.js');
 var debug = require('debug')('server:server');
-var http = require('http');
-var { port, appPort } = require('../configs/env.config');
-/**
- * Get port from environment and store in Express.
- */
-
-var port = normalizePort(port || appPort);
-app.set('port', port);
-
-/**
- * Create HTTP server.
- */
-
-var server = http.createServer(app);
-
-/**
- * Listen on provided port, on all network interfaces.
- */
-
-server.listen(port, () => {
-  console.log('Server listening on port ' + port);
-});
-server.on('error', onError);
-server.on('listening', onListening);
-
-/**
- * Normalize a port into a number, string, or false.
- */
 
 function normalizePort(val) {
   var port = parseInt(val, 10);
@@ -81,8 +46,14 @@ function onError(error) {
  * Event listener for HTTP server "listening" event.
  */
 
-function onListening() {
+function onListening(server) {
   var addr = server.address();
   var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
   debug('Listening on ' + bind);
 }
+
+module.exports = {
+  normalizePort,
+  onError,
+  onListening,
+};
