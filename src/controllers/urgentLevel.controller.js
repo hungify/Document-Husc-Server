@@ -10,7 +10,13 @@ const createUrgentLevel = async (req, res, next) => {
         `UrgentLevel with value "${label}" already exists`
       );
     }
-    const value = label;
+    const value = label
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[đĐ]/g, (m) => (m === 'đ' ? 'd' : 'D'))
+      .replace(/\s/g, '-');
+
     const newUrgentLevel = new UrgentLevel({ label, value, colorTag });
     const savedUrgentLevel = await newUrgentLevel.save();
     return res.status(201).json(savedUrgentLevel);
