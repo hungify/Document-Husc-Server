@@ -12,7 +12,12 @@ const createAgency = async (req, res, next) => {
       throw CreateError.Conflict(`Agency with value "${label}" already exists`);
     }
 
-    const value = label;
+    const value = label
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[đĐ]/g, (m) => (m === 'đ' ? 'd' : 'D'))
+      .replace(/\s/g, '-');
     const newAgency = new Agency({ label, value });
 
     const savedAgency = await newAgency.save();
