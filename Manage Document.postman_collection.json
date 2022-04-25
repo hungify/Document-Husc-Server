@@ -15,7 +15,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"label\": \"Đại Học Huế 1\"\n}",
+							"raw": "{\n    \"label\": \"Đại học Huế\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -41,7 +41,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"label\": \"Đại Học Huế update\"\n}",
+							"raw": "{\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -56,6 +56,23 @@
 							"path": [
 								"agencies",
 								"62616c61e6b7e844e937c310"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[Agency]: Get All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/agencies",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agencies"
 							]
 						}
 					},
@@ -90,7 +107,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\": \"Khoa học công nghệ 3\",\n    \"parentId\": \"62616d3ce6b7e844e937c331\"\n}",
+							"raw": "{\n    \"title\": \"Khoa học công nghệ 3\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -139,16 +156,16 @@
 			]
 		},
 		{
-			"name": "TypesOfCategory",
+			"name": "TypesOfDocuments",
 			"item": [
 				{
-					"name": "[TypeOfCategory]: Create",
+					"name": "[TypesOfDocuments]: Create",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"label\": \"Quyết định\"\n}",
+							"raw": "{\n    \"label\": \"Nghị quyết\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -168,7 +185,7 @@
 					"response": []
 				},
 				{
-					"name": "[TypeOfCategory]: Update",
+					"name": "[TypesOfDocuments]: Update",
 					"request": {
 						"method": "PUT",
 						"header": [],
@@ -195,7 +212,7 @@
 					"response": []
 				},
 				{
-					"name": "[TypeOfCategory]: Get All",
+					"name": "[TypesOfDocuments]: Get All",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -214,7 +231,7 @@
 			]
 		},
 		{
-			"name": "UrgentLevel",
+			"name": "UrgentLevels",
 			"item": [
 				{
 					"name": "[UrgentLevel]: Get All",
@@ -237,7 +254,25 @@
 					"name": "[UrgentLevel]: Create",
 					"request": {
 						"method": "POST",
-						"header": []
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"label\": \"Bình thường\",\n    \"colorTag\": \"yellow\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/urgent-levels",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"urgent-levels"
+							]
+						}
 					},
 					"response": []
 				},
@@ -263,6 +298,295 @@
 							"path": [
 								"urgent-levels",
 								"62618f63d65ee55bcb9554da"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Documents",
+			"item": [
+				{
+					"name": "[Document]: Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"documentNumber\": \"05/NQ-HĐĐH\",\n    \"title\": \"21/NQ-HĐĐH : Nghị quyết về việc công nhận Hiệu trưởng Trường Đại học Y - Dược, Đại học Huế nhiệm kỳ 2020 - 2025\",\n    \"content\": \"Căn cứ Nghị định số 30/CP ngày 04 tháng 4 năm 1994 của Chính phủ về việc thành lập Đại học Huế; Căn cứ Thông tư số 10/2020/TT-BGDĐT ngày 14 tháng 5 năm 2020 của Bộ trưởng Bộ Giáo dục và Đào tạo ban hành Quy chế tổ chức và hoạt động của đại học vùng và các cơ sở giáo dục đại học thành viên\",\n    \"signer\": \"Nguyễn Vũ Quốc Huy\",\n    \"issuedDate\": \"2020-05-01\",\n    \"typesOfDocument\": \"nghi-quyet\",\n    \"urgentLevel\": \"binh-thuong\",\n    \"agency\": \"dai-hoc-hue\",\n    \"category\": \"khoa-hoc-cong-nghe-2\",\n    \"relativeDocuments\": [],\n    \"publisherId\": \"6262d3736129d8ca00aa894d\",\n    \"publishDate\": \"10/10/2021\",\n    \"fileList\": [\n        {\n            \"fileName\": \"test.pdf\",\n            \"filePath\": \"https://google.com\"\n        }\n    ],\n    \"participants\": [\n        {\n            \"senderId\": \"6262d3736129d8ca00aa894d\",\n            \"sendDate\":\"10/10/2022\",\n            \"receivers\": [\n                {\n                    \"receiverId\": \"6262d3ddd3abc63b5ce998fe\"\n                }\n            ]\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/documents",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"documents"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[Document]: Update Read",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"readDate\": \"05/23/2022\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/documents/626611b33a395ff15195b9d8/receivers/6262d3736129d8ca00aa894d/6262d3ddd3abc63b5ce998fe",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"documents",
+								"626611b33a395ff15195b9d8",
+								"receivers",
+								"6262d3736129d8ca00aa894d",
+								"6262d3ddd3abc63b5ce998fe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[Document]: Forward Document",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"receivers\": [\"626355a0f5f73ddffffa995c\", \"62657974fcc0394ffd027ddb\",\"6266069b21666f36034af630\"],\n    \"forwardDate\": \"10/10/2022\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/documents/62660badaccf5c4ee9cc2c61/forward/6262d3ddd3abc63b5ce998fe",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"documents",
+								"62660badaccf5c4ee9cc2c61",
+								"forward",
+								"6262d3ddd3abc63b5ce998fe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[Document]: Get Detail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/documents/6263b867ba40ec648525e2eb",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"documents",
+								"6263b867ba40ec648525e2eb"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[Document]: List With Pagination",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/documents?page=1&limit=30",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"documents"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "30"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[Document]: List With Filter",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/documents?category=khoa-hoc-cong-nghe-3",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"documents"
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": "khoa-hoc-cong-nghe-3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[Document]: Search Text",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/documents?q=05",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"documents"
+							],
+							"query": [
+								{
+									"key": "q",
+									"value": "05"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[Document]: List Sort",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/documents?sort=-createdAt",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"documents"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "-createdAt"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[Document]: Combines Seach, Filter",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/documents?sort=-createdAt&agency=dai-hoc-hue&q=05",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"documents"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "-createdAt"
+								},
+								{
+									"key": "agency",
+									"value": "dai-hoc-hue"
+								},
+								{
+									"key": "q",
+									"value": "05"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "[Auth]: Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"18T1025511\",\n    \"email\": \"18T105511@husc.edu.vn\",\n    \"password\":\"123\",\n    \"role\":\"user\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "[User]: Get All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users"
 							]
 						}
 					},
