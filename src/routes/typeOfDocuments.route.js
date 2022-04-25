@@ -1,6 +1,7 @@
 const express = require('express');
 const typesOfDocumentController = require('../controllers/typesOfDocuments.controller');
 const typesOfDocumentValidation = require('../validations/typesOfDocuments.validation');
+const paramValidation = require('../validations/param.validation');
 
 const router = express.Router();
 
@@ -15,6 +16,7 @@ router
 router
   .route('/:typesOfDocumentId')
   .put(
+    paramValidation.objectId,
     typesOfDocumentValidation.createTypesOfDocuments,
     typesOfDocumentController.updateTypesOfDocuments
   );
