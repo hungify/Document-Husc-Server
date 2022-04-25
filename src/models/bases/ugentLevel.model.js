@@ -19,6 +19,7 @@ const urgentLevelSchema = new mongoose.Schema(
     label: {
       type: String,
       required: true,
+      unique: true,
     },
     colorTag: {
       type: String,
