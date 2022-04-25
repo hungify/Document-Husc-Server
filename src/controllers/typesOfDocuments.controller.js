@@ -11,7 +11,12 @@ const createTypesOfDocuments = async (req, res, next) => {
       );
     }
 
-    const value = label;
+    const value = label
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[đĐ]/g, (m) => (m === 'đ' ? 'd' : 'D'))
+      .replace(/\s/g, '-');
     const newTypesOfDocument = new TypeOfDocument({ label, value });
     const savedTypesOfDocument = await newTypesOfDocument.save();
 

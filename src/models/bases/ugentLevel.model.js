@@ -10,22 +10,25 @@ const COLORS_ENUM = [
   'pink',
 ];
 
-const urgentLevelSchema = new mongoose.Schema({
-  value: {
-    type: String,
-    required: true,
+const urgentLevelSchema = new mongoose.Schema(
+  {
+    value: {
+      type: String,
+      required: true,
+    },
+    label: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    colorTag: {
+      type: String,
+      enum: COLORS_ENUM,
+      required: true,
+    },
   },
-  label: {
-    type: String,
-    required: true,
-  },
-  colorTag: {
-    type: String,
-    enum: COLORS_ENUM,
-    required: true,
-  },
-  timestamps: true,
-});
+  { timestamps: true }
+);
 
 const UrgentLevel = connectToMongoLocal.model('UrgentLevel', urgentLevelSchema);
 
