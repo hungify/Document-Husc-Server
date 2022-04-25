@@ -1,4 +1,4 @@
-const Agency = require('../models/bases/agency.model');
+const Agency = require('../models/agency.model');
 const CreateError = require('http-errors');
 const agencyValidation = require('../validations/agency.validation');
 

@@ -1,6 +1,6 @@
 const Joi = require('joi');
 const CreateError = require('http-errors');
-const { COLORS_ENUM } = require('../models/bases/ugentLevel.model');
+const { COLORS_ENUM } = require('../models/ugentLevel.model');
 
 const createUrgentLevel = async (req, res, next) => {
   const urgentLevelSchema = Joi.object({

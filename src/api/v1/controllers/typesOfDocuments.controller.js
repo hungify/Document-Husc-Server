@@ -1,5 +1,5 @@
 const CreateError = require('http-errors');
-const TypeOfDocument = require('../models/bases/typeOfDocument.model');
+const TypeOfDocument = require('../models/typeOfDocument.model');
 
 const createTypesOfDocuments = async (req, res, next) => {
   try {

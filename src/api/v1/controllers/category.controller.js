@@ -1,5 +1,5 @@
 const CreateError = require('http-errors');
-const Category = require('../models/bases/category.model');
+const Category = require('../models/category.model');
 
 const createCategory = async (req, res, next) => {
   try {

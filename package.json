@@ -4,7 +4,7 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
-    "start": "nodemon ./src/bin/www"
+    "start": "nodemon server.js"
   },
   "dependencies": {
     "apicache": "^1.6.3",
