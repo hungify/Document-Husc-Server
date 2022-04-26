@@ -3,9 +3,9 @@ if (process.env.NODE_ENV !== 'production') {
     path: '.env.development.local',
   });
 }
+
 module.exports = {
-  port: process.env.PORT,
-  appPort: process.env.APP_PORT || 3001,
+  port: process.env.PORT || process.env.APP_PORT || 8888,
   mongoDB: {
     username: process.env.MONGO_DB_USERNAME || '',
     password: process.env.MONGO_DB_PASSWORD || '',
