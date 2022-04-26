@@ -4,14 +4,18 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const helmet = require('helmet');
 const cors = require('cors');
-// const apicache = require('apicache');
-const connectToMongoLocal = require('../../configs/db.config');
+const xss = require('xss-clean');
+const mongoSanitize = require('express-mongo-sanitize');
+const compression = require('compression');
+const { connectToMongoLocal } = require('../../configs/db.config');
+const errorHandler = require('./middlewares/error');
 
 const bootServer = () => {
   const app = express();
-  // const cache = apicache.middleware;
-  // app.use(cache('5 minutes'));
   app.use(helmet());
+  app.use(xss());
+  app.use(mongoSanitize());
+  app.use(compression());
   app.use(logger('dev'));
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
@@ -31,25 +35,17 @@ const bootServer = () => {
   app.use(function (req, res, next) {
     next(createError(404));
   });
-
   // error handler
-  app.use(function (err, req, res, next) {
-    // set locals, only providing error in development
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
+  app.use(errorHandler);
 
-    // render the error page
-    res.status(err.status || 500);
-    res.json({
-      message: err.message,
-    });
-  });
   return app;
 };
+const app = bootServer();
 
-let app;
 if (connectToMongoLocal) {
-  app = bootServer();
+  connectToMongoLocal.on('open', () => {
+    app.emit('ready');
+  });
 }
 
 module.exports = app;
