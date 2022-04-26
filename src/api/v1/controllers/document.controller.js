@@ -148,10 +148,13 @@ const getListDocuments = async (req, res, next) => {
     const documents = result[0].status === 'fulfilled' ? result[0].value : [];
     const total = result[1].status === 'fulfilled' ? result[1].value : 0;
     const realDocs = documents.filter((d) => d.category); //populate will be null if filter is't match
+
     return res.status(200).json({
       total,
       totalMatch: realDocs.length,
       documents: realDocs,
+
+      documents: documents,
     });
   } catch (error) {
     next(error);

@@ -40,6 +40,7 @@ const bootServer = () => {
 
   return app;
 };
+
 const app = bootServer();
 
 if (connectToMongoLocal) {
