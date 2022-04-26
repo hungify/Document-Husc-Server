@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const connectToMongoLocal = require('../../../configs/db.config');
+const { connectToMongoLocal } = require('../../../configs/db.config');
 
 const agencySchema = new mongoose.Schema(
   {

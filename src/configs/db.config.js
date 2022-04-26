@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const { mongoDB } = require('./env.config');
 
+const URI = `mongodb://${mongoDB.username}:${mongoDB.password}@${mongoDB.host}:${mongoDB.port}/${mongoDB.databaseName}?authSource=${mongoDB.authSource}`;
+
 const newConnection = (uri) => {
   const conn = mongoose.createConnection(uri, {
     serverSelectionTimeoutMS: 3000,
@@ -28,8 +30,6 @@ const newConnection = (uri) => {
   return conn;
 };
 
-const connectionURI = `mongodb://${mongoDB.username}:${mongoDB.password}@${mongoDB.host}:${mongoDB.port}/${mongoDB.databaseName}?authSource=${mongoDB.authSource}`;
+const connectToMongoLocal = newConnection(URI);
 
-const connectToMongoLocal = newConnection(connectionURI);
-
-module.exports = connectToMongoLocal;
+module.exports = { connectToMongoLocal };
