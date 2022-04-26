@@ -315,7 +315,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"documentNumber\": \"05/NQ-HĐĐH\",\n    \"title\": \"21/NQ-HĐĐH : Nghị quyết về việc công nhận Hiệu trưởng Trường Đại học Y - Dược, Đại học Huế nhiệm kỳ 2020 - 2025\",\n    \"content\": \"Căn cứ Nghị định số 30/CP ngày 04 tháng 4 năm 1994 của Chính phủ về việc thành lập Đại học Huế; Căn cứ Thông tư số 10/2020/TT-BGDĐT ngày 14 tháng 5 năm 2020 của Bộ trưởng Bộ Giáo dục và Đào tạo ban hành Quy chế tổ chức và hoạt động của đại học vùng và các cơ sở giáo dục đại học thành viên\",\n    \"signer\": \"Nguyễn Vũ Quốc Huy\",\n    \"issuedDate\": \"2020-05-01\",\n    \"typesOfDocument\": \"nghi-quyet\",\n    \"urgentLevel\": \"binh-thuong\",\n    \"agency\": \"dai-hoc-hue\",\n    \"category\": \"khoa-hoc-cong-nghe-2\",\n    \"relativeDocuments\": [],\n    \"publisherId\": \"6262d3736129d8ca00aa894d\",\n    \"publishDate\": \"10/10/2021\",\n    \"fileList\": [\n        {\n            \"fileName\": \"test.pdf\",\n            \"filePath\": \"https://google.com\"\n        }\n    ],\n    \"participants\": [\n        {\n            \"senderId\": \"6262d3736129d8ca00aa894d\",\n            \"sendDate\":\"10/10/2022\",\n            \"receivers\": [\n                {\n                    \"receiverId\": \"6262d3ddd3abc63b5ce998fe\"\n                }\n            ]\n        }\n    ]\n}",
+							"raw": "{\n    \"documentNumber\": \"015/NQ-HĐĐH\",\n    \"title\": \"Test\",\n    \"signer\": \"Nguyễn Vũ Quốc Huy\",\n    \"issuedDate\": \"2020-05-01\",\n    \"typesOfDocument\": \"nghi-quyet\",\n    \"urgentLevel\": \"binh-thuong\",\n    \"agency\": \"dai-hoc-hue\",\n    \"category\": \"khoa-hoc-cong-nghe-2\",\n    \"relativeDocuments\": [],\n    \"publisherId\": \"6262d3736129d8ca00aa894d\",\n    \"publishDate\": \"10/10/2021\",\n    \"fileList\": [\n        {\n            \"fileName\": \"test.pdf\",\n            \"filePath\": \"https://google.com\"\n        }\n    ],\n    \"participants\": [\n        {\n            \"senderId\": \"6262d3736129d8ca00aa894d\",\n            \"sendDate\":\"10/10/2022\",\n            \"receivers\": [\n                {\n                    \"receiverId\": \"6262d3ddd3abc63b5ce998fe\"\n                }\n            ]\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -365,7 +365,7 @@
 					"response": []
 				},
 				{
-					"name": "[Document]: Forward Document",
+					"name": "[Document]: Forward",
 					"request": {
 						"method": "PUT",
 						"header": [],
@@ -444,7 +444,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/documents?category=khoa-hoc-cong-nghe-3",
+							"raw": "{{baseUrl}}/documents?title[regex]=T",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -453,8 +453,8 @@
 							],
 							"query": [
 								{
-									"key": "category",
-									"value": "khoa-hoc-cong-nghe-3"
+									"key": "title[regex]",
+									"value": "T"
 								}
 							]
 						}
@@ -467,7 +467,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/documents?q=05",
+							"raw": "{{baseUrl}}/documents?q=T",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -477,7 +477,7 @@
 							"query": [
 								{
 									"key": "q",
-									"value": "05"
+									"value": "T"
 								}
 							]
 						}
@@ -508,7 +508,7 @@
 					"response": []
 				},
 				{
-					"name": "[Document]: Combines Seach, Filter",
+					"name": "[Document]: Combines",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -532,6 +532,37 @@
 								{
 									"key": "q",
 									"value": "05"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[Document]: Range Date",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/documents?orderBy=createdAt&start=2022/04/26&end=2022/04/27",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"documents"
+							],
+							"query": [
+								{
+									"key": "orderBy",
+									"value": "createdAt"
+								},
+								{
+									"key": "start",
+									"value": "2022/04/26"
+								},
+								{
+									"key": "end",
+									"value": "2022/04/27"
 								}
 							]
 						}
