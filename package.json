@@ -7,14 +7,15 @@
     "start": "nodemon server.js"
   },
   "dependencies": {
-    "apicache": "^1.6.3",
     "bcryptjs": "^2.4.3",
+    "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "debug": "^4.3.4",
     "dotenv": "^16.0.0",
     "ejs": "^3.1.6",
     "express": "^4.17.3",
+    "express-mongo-sanitize": "^2.2.0",
     "helmet": "^5.0.2",
     "http-errors": "^2.0.0",
     "ioredis": "^5.0.4",
@@ -25,7 +26,8 @@
     "mongoose": "^6.3.0",
     "morgan": "^1.10.0",
     "remove-accents": "^0.4.2",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "xss-clean": "^0.1.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"
