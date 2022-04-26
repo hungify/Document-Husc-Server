@@ -8,7 +8,6 @@ function APICore(queryString, query) {
   this.paginating = () => {
     const page = parseInt(this.queryString.page, 10) || 1;
     const limit = parseInt(this.queryString.limit, 10) || 10;
-    console.log('🚀 :: limit', limit);
     const skip = (page - 1) * limit;
     this.query = this.query.limit(limit).skip(skip);
     return this;
@@ -40,7 +39,9 @@ function APICore(queryString, query) {
     excludedFields.forEach((el) => delete queryObject[el]);
 
     const queryKeys = Object.keys(queryObject);
+
     const filterKeys = ['category', 'agency', 'urgentLevel', 'typeOfDocument'];
+    const filterRangeKeys = ['createdAt', 'updatedAt', 'start', 'end'];
 
     if (_.intersection(queryKeys, filterKeys).length > 0) {
       const keys = Object.keys(queryObject);
@@ -53,9 +54,33 @@ function APICore(queryString, query) {
           match: { value: values[keys.indexOf(key)] },
         };
       });
-      this.query = this.query
-        .find()
-        .populate(populates.map((populate) => populate));
+      this.query = this.query.find().populate(populates.map((p) => p));
+      return this;
+    } else if (_.intersection(queryKeys, filterRangeKeys).length > 0) {
+      const keys = Object.keys(queryObject).filter(
+        (key) => key.includes('start') || key.includes('end')
+      );
+      const values = Object.values(queryObject);
+      const filterField = values.splice(0, 1);
+
+      const range = keys.map((key) => {
+        return key === 'start'
+          ? {
+              compare: '$gte',
+              value: new Date(values[keys.indexOf(key)]).toISOString(),
+            }
+          : {
+              compare: '$lt',
+              value: new Date(values[keys.indexOf(key)]).toISOString(),
+            };
+      });
+      const query = {
+        [filterField]: Object.fromEntries(
+          range.map((item) => [item.compare, item.value])
+        ),
+      };
+
+      this.query = this.query.find(query);
       return this;
     } else {
       let queryStr = JSON.stringify(queryObject);
