@@ -8,7 +8,7 @@ const xss = require('xss-clean');
 const mongoSanitize = require('express-mongo-sanitize');
 const compression = require('compression');
 const { connectToMongoLocal } = require('../../configs/db.config');
-const errorHandler = require('./middlewares/error');
+const { errorHandler, multerErrorHandler } = require('./middlewares/error');
 
 const bootServer = () => {
   const app = express();
@@ -31,6 +31,7 @@ const bootServer = () => {
     });
   });
 
+  app.use(multerErrorHandler);
   // catch 404 and forward to error handler
   app.use(function (req, res, next) {
     next(createError(404));
