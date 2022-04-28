@@ -6,6 +6,7 @@ const Category = require('../models/category.model');
 const User = require('../models/user.model');
 const { UrgentLevel } = require('../models/ugentLevel.model');
 const APICore = require('../libs/apiCore');
+const { uploadFiles } = require('../utils/s3');
 
 const createDocument = async (req, res, next) => {
   try {
@@ -13,8 +14,8 @@ const createDocument = async (req, res, next) => {
       //properties
       documentNumber,
       signer,
-      issuedDate,
-      typesOfDocument,
+      issueDate,
+      typesOfDocuments,
       urgentLevel,
       agency,
       category,
@@ -22,11 +23,9 @@ const createDocument = async (req, res, next) => {
       title,
       content,
       summary,
-      fileList,
       relativeDocuments,
       publisherId,
       publishDate,
-
       participants,
     } = req.body;
 
@@ -40,12 +39,12 @@ const createDocument = async (req, res, next) => {
     }
     // get reference to typeOfDocument
     const foundTypeOfDocument = await TypeOfDocument.findOne({
-      value: typesOfDocument,
+      value: typesOfDocuments,
     });
 
     if (!foundTypeOfDocument) {
       throw CreateError.BadRequest(
-        `Type of document "${typesOfDocument}" does not exist`
+        `Type of document "${typesOfDocuments}" does not exist`
       );
     }
 
@@ -101,12 +100,15 @@ const createDocument = async (req, res, next) => {
         throw CreateError.BadRequest(`Some of the parents are invalid`);
       }
     }
+
+    const files = await uploadFiles(req.files);
+
     const newDocument = new Document({
       //properties
       title,
       documentNumber,
       signer,
-      issuedDate,
+      issueDate,
       typesOfDocument: foundTypeOfDocument._id,
       urgentLevel: foundUrgentLevel._id,
       agency: foundAgency._id,
@@ -115,7 +117,7 @@ const createDocument = async (req, res, next) => {
       title,
       content,
       summary,
-      fileList,
+      fileList: files,
       relativeDocuments,
 
       publisherId,
