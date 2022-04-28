@@ -15,7 +15,7 @@ const createDocument = async (req, res, next) => {
       documentNumber,
       signer,
       issueDate,
-      typesOfDocuments,
+      typesOfDocument,
       urgentLevel,
       agency,
       category,
@@ -39,12 +39,12 @@ const createDocument = async (req, res, next) => {
     }
     // get reference to typeOfDocument
     const foundTypeOfDocument = await TypeOfDocument.findOne({
-      value: typesOfDocuments,
+      value: typesOfDocument,
     });
 
     if (!foundTypeOfDocument) {
       throw CreateError.BadRequest(
-        `Type of document "${typesOfDocuments}" does not exist`
+        `Type of document "${typesOfDocument}" does not exist`
       );
     }
 
@@ -122,8 +122,6 @@ const createDocument = async (req, res, next) => {
 
       publisherId,
       publishDate,
-
-      participants,
     });
 
     const savedDocument = await newDocument.save();
