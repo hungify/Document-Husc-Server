@@ -109,10 +109,13 @@ const documentSchema = new mongoose.Schema(
         _id: false,
         originalName: {
           type: String,
+          required: true,
         },
         location: {
           type: String,
+          required: true,
         },
+        default: [],
       },
     ],
   },
