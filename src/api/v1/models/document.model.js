@@ -12,7 +12,7 @@ const documentSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    issuedDate: {
+    issueDate: {
       type: Date,
       required: true,
     },
@@ -107,10 +107,10 @@ const documentSchema = new mongoose.Schema(
     fileList: [
       {
         _id: false,
-        fileName: {
+        originalName: {
           type: String,
         },
-        filePath: {
+        location: {
           type: String,
         },
       },
