@@ -4,14 +4,14 @@ const path = require('path');
 const storage = multer.memoryStorage({});
 
 const fileFilter = (req, file, cb) => {
-  // const filetypes = /pdf|doc|docx/;
-  // const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-  // const mimetype = filetypes.test(file.mimetype);
-  return cb(null, true);
-  // if (mimetype && extname) {
-  // } else {
-  //   cb(new multer.MulterError('LIMIT_UNEXPECTED_FILE'), false);
-  // }
+  const filetypes = /pdf|doc|docx/;
+  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+  const mimetype = filetypes.test(file.mimetype);
+  if (mimetype && extname) {
+    return cb(null, true);
+  } else {
+    cb(new multer.MulterError('LIMIT_UNEXPECTED_FILE'), false);
+  }
 };
 
 const limits = {

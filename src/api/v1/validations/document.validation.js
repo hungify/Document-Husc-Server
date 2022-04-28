@@ -3,40 +3,42 @@ const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 
 const createDocument = async (req, res, next) => {
-  const documentSchema = Joi.object().keys({
-    //properties
-    typesOfDocument: Joi.string().required(),
-    urgentLevel: Joi.string().required(),
-    agency: Joi.string().required(),
-    category: Joi.string().required(),
+  const documentSchema = Joi.object()
+    .keys({
+      //properties
+      typesOfDocument: Joi.string().required(),
+      urgentLevel: Joi.string().required(),
+      agency: Joi.string().required(),
+      category: Joi.string().required(),
 
-    documentNumber: Joi.string().required(),
-    signer: Joi.string().required(),
-    issueDate: Joi.date().required(),
-    //properties
+      documentNumber: Joi.string().required(),
+      signer: Joi.string().required(),
+      issueDate: Joi.date().required(),
 
-    title: Joi.string().required(),
-    summary: Joi.string(),
-    content: Joi.string(),
-    validityStatus: Joi.string().valid('valid', 'invalid').default('valid'),
+      title: Joi.string().required(),
+      relatedDocuments: Joi.string().allow(''),
+      //properties
+      validityStatus: Joi.string().valid('valid', 'invalid').default('valid'),
 
-    relativeDocuments: Joi.array().items(Joi.objectId()),
+      publisherId: Joi.objectId().required(),
+      publishDate: Joi.date().required(),
 
-    publisherId: Joi.objectId().required(),
-    publishDate: Joi.date().required(),
-
-    participants: Joi.array().items({
-      senderId: Joi.objectId().required(),
-      sendDate: Joi.date().required(),
-      receivers: Joi.array().items({
-        receiverId: Joi.objectId().required(),
-        readDate: Joi.date().default(null),
+      documentFrom: Joi.string().valid('input', 'attach').required(),
+    })
+    .when('.documentFrom', {
+      is: 'input',
+      then: Joi.object().keys({
+        content: Joi.string().required(),
       }),
-    }),
-  });
+    })
+    .when('.documentFrom', {
+      is: 'attach',
+      then: Joi.object().keys({
+        summary: Joi.string().required(),
+      }),
+    });
 
   try {
-    console.log('🚀 :: req.body', req.body);
     await documentSchema.validateAsync(req.body);
     next();
   } catch (error) {

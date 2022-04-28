@@ -6,11 +6,14 @@ const upload = require('../middlewares/multer');
 
 const router = express.Router();
 
-router.route('/').get(documentController.getListDocuments).post(
-  upload.array('files', 5),
-  // documentValidation.createDocument,
-  documentController.createDocument
-);
+router
+  .route('/')
+  .get(documentController.getListDocuments)
+  .post(
+    upload.array('files', 5),
+    documentValidation.createDocument,
+    documentController.createDocument
+  );
 
 router
   .route('/:documentId')
