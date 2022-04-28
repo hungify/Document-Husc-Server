@@ -12,18 +12,12 @@ const createDocument = async (req, res, next) => {
 
     documentNumber: Joi.string().required(),
     signer: Joi.string().required(),
-    issuedDate: Joi.date().required(),
+    issueDate: Joi.date().required(),
     //properties
 
     title: Joi.string().required(),
     summary: Joi.string(),
     content: Joi.string(),
-    fileList: Joi.array().items(
-      Joi.object({
-        fileName: Joi.string().required(),
-        filePath: Joi.string().required(),
-      })
-    ),
     validityStatus: Joi.string().valid('valid', 'invalid').default('valid'),
 
     relativeDocuments: Joi.array().items(Joi.objectId()),
@@ -42,6 +36,7 @@ const createDocument = async (req, res, next) => {
   });
 
   try {
+    console.log('🚀 :: req.body', req.body);
     await documentSchema.validateAsync(req.body);
     next();
   } catch (error) {
@@ -66,7 +61,6 @@ const getListDocuments = async (req, res, next) => {
     page: Joi.number().integer().min(1).default(1),
     limit: Joi.number().integer().min(1).default(10),
     sort: Joi.string().valid('-createdAt', '-updatedAt').default('-createdAt'),
-    
   });
   try {
     await documentSchema.validateAsync(req.query);
