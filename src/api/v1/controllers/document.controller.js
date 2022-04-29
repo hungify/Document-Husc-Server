@@ -7,6 +7,7 @@ const User = require('../models/user.model');
 const { UrgentLevel } = require('../models/ugentLevel.model');
 const APICore = require('../libs/apiCore');
 const { uploadFiles } = require('../utils/s3');
+const { populate } = require('../models/document.model');
 
 const createDocument = async (req, res, next) => {
   try {
@@ -101,7 +102,10 @@ const createDocument = async (req, res, next) => {
       }
     }
 
-    const files = await uploadFiles(req.files);
+    let files = [];
+    if (req.files) {
+      files = await uploadFiles(req.files);
+    }
 
     const newDocument = new Document({
       //properties
@@ -141,7 +145,15 @@ const getListDocuments = async (req, res, next) => {
       .filtering();
 
     const result = await Promise.allSettled([
-      api.query.select('-__v'),
+      api.query
+        .populate('agency', 'label value -_id')
+        .populate('category', 'title value -_id')
+        .populate('urgentLevel', 'label value colorTag -_id')
+        .populate('typesOfDocument', 'label value -_id')
+        .populate('publisher', 'username -_id')
+        .select(
+          'agency category urgentLevel typesOfDocument documentNumber title signer issueDate fileList'
+        ),
       Document.countDocuments({}),
     ]);
 
@@ -166,13 +178,50 @@ const getDocumentDetail = async (req, res, next) => {
     const { documentId } = req.params;
     const foundDocument = await Document.findOne({ _id: documentId })
       .select('-__v')
+      .populate('agency', 'label value -_id')
+      .populate('category', 'title value -_id')
+      .populate('urgentLevel', 'label value colorTag -_id')
+      .populate('typesOfDocument', 'label value -_id')
+      .populate('publisher', 'username -_id')
+      .select('-__v -createdAt -updatedAt')
       .exec();
 
     if (!foundDocument) {
       throw CreateError.NotFound(`Document "${documentId}" does not exist`);
     }
 
-    return res.status(200).json(foundDocument);
+    const {
+      agency,
+      category,
+      typesOfDocument,
+      documentNumber,
+      urgentLevel,
+      issueDate,
+      signer,
+      title,
+      content,
+      summary,
+    } = foundDocument;
+
+    const result = {
+      property: {
+        agency,
+        category,
+        typesOfDocument,
+        documentNumber,
+        urgentLevel,
+        issueDate,
+        signer,
+        title,
+        content,
+        summary,
+      },
+      files: foundDocument.fileList,
+      participants: foundDocument.participants,
+      relatedDocuments: foundDocument.relativeDocuments,
+    };
+
+    return res.status(200).json(result);
   } catch (error) {
     next(error);
   }
