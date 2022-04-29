@@ -16,7 +16,9 @@ const createDocument = async (req, res, next) => {
       issueDate: Joi.date().required(),
 
       title: Joi.string().required(),
-      relatedDocuments: Joi.string().allow(''),
+      relatedDocuments: Joi.alternatives()
+        .try(Joi.array().items(Joi.objectId()), Joi.string().allow(''))
+        .required(),
       //properties
       validityStatus: Joi.string().valid('valid', 'invalid').default('valid'),
 
@@ -24,6 +26,14 @@ const createDocument = async (req, res, next) => {
       publishDate: Joi.date().required(),
 
       documentFrom: Joi.string().valid('input', 'attach').required(),
+
+      participants: Joi.array().items({
+        senderId: Joi.objectId().required(),
+        sendDate: Joi.date().required(),
+        receivers: Joi.array().items({
+          receiverId: Joi.objectId().required(),
+        }),
+      }),
     })
     .when('.documentFrom', {
       is: 'input',
@@ -87,7 +97,6 @@ const forwardDocument = async (req, res, next) => {
 };
 
 const getDocumentByFilter = async (req, res, next) => {
-  console.log('🚀 :: req.query', req.query);
   const documentSchema = Joi.object().keys({
     field: Joi.string()
       .valid('types-of-document', 'agency', 'category')
