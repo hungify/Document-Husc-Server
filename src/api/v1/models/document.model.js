@@ -17,7 +17,7 @@ const documentSchema = new mongoose.Schema(
       required: true,
     },
     typesOfDocument: {
-      ref: 'TypesOfDocument',
+      ref: 'TypesOfDocuments',
       type: mongoose.Schema.Types.ObjectId,
       required: true,
     },
@@ -67,13 +67,9 @@ const documentSchema = new mongoose.Schema(
         default: [],
       },
     ],
-    publisherId: {
+    publisher: {
       ref: 'Users',
       type: mongoose.Schema.Types.ObjectId,
-      required: true,
-    },
-    publishDate: {
-      type: Date,
       required: true,
     },
     participants: [
@@ -115,7 +111,6 @@ const documentSchema = new mongoose.Schema(
           type: String,
           required: true,
         },
-        default: [],
       },
     ],
   },
