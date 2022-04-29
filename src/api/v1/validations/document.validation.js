@@ -22,7 +22,7 @@ const createDocument = async (req, res, next) => {
       //properties
       validityStatus: Joi.string().valid('valid', 'invalid').default('valid'),
 
-      publisherId: Joi.objectId().required(),
+      publisher: Joi.objectId().required(),
       publishDate: Joi.date().required(),
 
       documentFrom: Joi.string().valid('input', 'attach').required(),
