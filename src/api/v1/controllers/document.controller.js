@@ -7,7 +7,6 @@ const User = require('../models/user.model');
 const { UrgentLevel } = require('../models/ugentLevel.model');
 const APICore = require('../libs/apiCore');
 const { uploadFiles } = require('../utils/s3');
-const { populate } = require('../models/document.model');
 
 const createDocument = async (req, res, next) => {
   try {
@@ -25,19 +24,11 @@ const createDocument = async (req, res, next) => {
       content,
       summary,
       relativeDocuments,
-      publisherId,
+      publisher,
       publishDate,
       participants,
     } = req.body;
 
-    const foundDocument = await Document.findOne({
-      documentNumber,
-    });
-    if (foundDocument) {
-      throw CreateError.Conflict(
-        `Document with documentNumber "${documentNumber}" already exists`
-      );
-    }
     // get reference to typeOfDocument
     const foundTypeOfDocument = await TypeOfDocument.findOne({
       value: typesOfDocument,
@@ -78,9 +69,9 @@ const createDocument = async (req, res, next) => {
       }
     }
 
-    const foundPublisher = await User.findOne({ _id: publisherId });
+    const foundPublisher = await User.findOne({ _id: publisher });
     if (!foundPublisher) {
-      throw CreateError.BadRequest(`Publisher "${publisherId}" does not exist`);
+      throw CreateError.BadRequest(`Publisher "${publisher}" does not exist`);
     }
 
     if (participants) {
@@ -124,13 +115,16 @@ const createDocument = async (req, res, next) => {
       fileList: files,
       relativeDocuments,
 
-      publisherId,
+      publisher,
       publishDate,
     });
 
     const savedDocument = await newDocument.save();
 
-    return res.status(201).json(savedDocument);
+    return res.status(201).json({
+      message: 'Văn bản đã được ban hành thành công',
+      savedDocument,
+    });
   } catch (error) {
     next(error);
   }
