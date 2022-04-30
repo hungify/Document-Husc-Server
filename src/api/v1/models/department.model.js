@@ -1,24 +1,22 @@
 const mongoose = require('mongoose');
 const { connectToMongoLocal } = require('../../../configs/db.config');
 
-const departmentSchema = new mongoose.Schema({
-  key: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  title: {
-    type: String,
-    required: true,
-  },
-  members: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Users',
+const departmentSchema = new mongoose.Schema(
+  {
+    value: {
+      type: String,
+      required: true,
+      unique: true,
     },
-  ],
-  timestamps: true,
-});
+    label: {
+      type: String,
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
 const Department = connectToMongoLocal.model('Departments', departmentSchema);
 

@@ -1,5 +1,7 @@
 const CreateError = require('http-errors');
 const Joi = require('joi');
+const { isJSON } = require('../utils/index');
+
 Joi.objectId = require('joi-objectid')(Joi);
 
 const createDocument = async (req, res, next) => {
@@ -13,7 +15,6 @@ const createDocument = async (req, res, next) => {
 
       documentNumber: Joi.string().required(),
       signer: Joi.string().required(),
-      issueDate: Joi.date().required(),
 
       title: Joi.string().required(),
       relatedDocuments: Joi.alternatives()
@@ -23,17 +24,20 @@ const createDocument = async (req, res, next) => {
       validityStatus: Joi.string().valid('valid', 'invalid').default('valid'),
 
       publisher: Joi.objectId().required(),
-      publishDate: Joi.date().required(),
+      issueDate: Joi.date().required(),
 
       documentFrom: Joi.string().valid('input', 'attach').required(),
 
-      participants: Joi.array().items({
+      participants: Joi.object({
         senderId: Joi.objectId().required(),
         sendDate: Joi.date().required(),
-        receivers: Joi.array().items({
-          receiverId: Joi.objectId().required(),
-        }),
-      }),
+        receivers: Joi.array()
+          .items({
+            receiverId: Joi.objectId().required(),
+          })
+          .default([])
+          .required(),
+      }).required(),
     })
     .when('.documentFrom', {
       is: 'input',
@@ -49,7 +53,13 @@ const createDocument = async (req, res, next) => {
     });
 
   try {
-    await documentSchema.validateAsync(req.body);
+    let body = {
+      ...req.body,
+    };
+    if (isJSON(req.body.participants)) {
+      body.participants = JSON.parse(req.body.participants);
+    }
+    await documentSchema.validateAsync(body);
     next();
   } catch (error) {
     next(CreateError.BadRequest(error.message));
