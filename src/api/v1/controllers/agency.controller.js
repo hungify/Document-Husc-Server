@@ -22,7 +22,10 @@ const createAgency = async (req, res, next) => {
 
     const savedAgency = await newAgency.save();
 
-    return res.status(201).json(savedAgency);
+    return res.status(201).json({
+      message: 'success',
+      data: savedAgency,
+    });
   } catch (error) {
     next(error);
   }
@@ -51,7 +54,10 @@ const updateAgency = async (req, res, next) => {
       { new: true }
     );
 
-    return res.status(200).json(updatedAgency);
+    return res.status(200).json({
+      message: 'success',
+      data: updatedAgency,
+    });
   } catch (error) {
     next(error);
   }
@@ -63,7 +69,7 @@ const deleteAgency = async (req, res, next) => {
     await Agency.findByIdAndDelete(agencyId);
     // Delete all references to this agency in the database
     return res.status(200).json({
-      message: 'Agency deleted successfully',
+      message: 'success',
     });
   } catch (error) {
     next(error);
@@ -73,7 +79,10 @@ const deleteAgency = async (req, res, next) => {
 const getAllAgencies = async (req, res, next) => {
   try {
     const foundAgencies = await Agency.find({});
-    return res.status(200).json(foundAgencies);
+    return res.status(200).json({
+      message: 'success',
+      data: foundAgencies,
+    });
   } catch (error) {
     next(error);
   }
