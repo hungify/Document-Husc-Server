@@ -19,7 +19,10 @@ const createUrgentLevel = async (req, res, next) => {
 
     const newUrgentLevel = new UrgentLevel({ label, value, colorTag });
     const savedUrgentLevel = await newUrgentLevel.save();
-    return res.status(201).json(savedUrgentLevel);
+    return res.status(201).json({
+      message: 'success',
+      data: savedUrgentLevel,
+    });
   } catch (error) {
     next(error);
   }
@@ -53,7 +56,10 @@ const updateUrgentLevel = async (req, res, next) => {
       { label, value, colorTag },
       { new: true }
     );
-    return res.status(200).json(updatedUrgentLevel);
+    return res.status(200).json({
+      message: 'success',
+      data: updatedUrgentLevel,
+    });
   } catch (error) {
     next(error);
   }
@@ -62,7 +68,10 @@ const updateUrgentLevel = async (req, res, next) => {
 const getAllUrgentLevels = async (req, res, next) => {
   try {
     const foundUrgentLevels = await UrgentLevel.find({});
-    return res.status(200).json(foundUrgentLevels);
+    return res.status(200).json({
+      message: 'success',
+      data: foundUrgentLevels,
+    });
   } catch (error) {
     next(error);
   }
