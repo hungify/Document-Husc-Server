@@ -20,7 +20,10 @@ const createTypesOfDocuments = async (req, res, next) => {
     const newTypesOfDocument = new TypeOfDocument({ label, value });
     const savedTypesOfDocument = await newTypesOfDocument.save();
 
-    return res.status(201).json(savedTypesOfDocument);
+    return res.status(201).json({
+      message: 'success',
+      data: savedTypesOfDocument,
+    });
   } catch (error) {
     next(error);
   }
@@ -58,7 +61,10 @@ const updateTypesOfDocuments = async (req, res, next) => {
       { new: true }
     );
 
-    return res.status(200).json(updatedTypesOfDocument);
+    return res.status(200).json({
+      message: 'success',
+      data: updatedTypesOfDocument,
+    });
   } catch (error) {
     next(error);
   }
@@ -67,7 +73,10 @@ const updateTypesOfDocuments = async (req, res, next) => {
 const getAllTypesOfDocuments = async (req, res, next) => {
   try {
     const foundTypesOfDocuments = await TypeOfDocument.find({});
-    return res.status(200).json(foundTypesOfDocuments);
+    return res.status(200).json({
+      message: 'success',
+      data: foundTypesOfDocuments,
+    });
   } catch (error) {
     next(error);
   }

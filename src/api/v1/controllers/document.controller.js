@@ -7,6 +7,7 @@ const User = require('../models/user.model');
 const { UrgentLevel } = require('../models/ugentLevel.model');
 const APICore = require('../libs/apiCore');
 const { uploadFiles } = require('../utils/s3');
+const { isJSON } = require('../utils/index');
 
 const createDocument = async (req, res, next) => {
   try {
@@ -25,9 +26,17 @@ const createDocument = async (req, res, next) => {
       summary,
       relativeDocuments,
       publisher,
-      publishDate,
       participants,
     } = req.body;
+
+    let participantsParsed = null;
+    if (participants) {
+      if (isJSON(participants)) {
+        participantsParsed = JSON.parse(participants);
+      } else {
+        participantsParsed = participants;
+      }
+    }
 
     // get reference to typeOfDocument
     const foundTypeOfDocument = await TypeOfDocument.findOne({
@@ -64,7 +73,7 @@ const createDocument = async (req, res, next) => {
 
       if (countValidDocuments !== relativeDocuments?.length) {
         throw CreateError.BadRequest(
-          `Some of the relative documents are invalid`
+          `Some of the relative documents does not exist`
         );
       }
     }
@@ -74,22 +83,15 @@ const createDocument = async (req, res, next) => {
       throw CreateError.BadRequest(`Publisher "${publisher}" does not exist`);
     }
 
-    if (participants) {
-      const validSender = User.findOne({ _id: participants[0].senderId });
-      if (!validSender) {
-        throw CreateError.BadRequest(
-          `Sender "${participants[0].senderId}" does not exist`
-        );
-      }
-
+    if (participantsParsed && participantsParsed.receivers.length > 0) {
       const countValidReceivers = await User.countDocuments({
         _id: {
-          $in: participants[0].receivers.map((r) => r.receiverId),
+          $in: participantsParsed?.receivers?.map((r) => r.receiverId),
         },
       });
 
       if (countValidReceivers === 0) {
-        throw CreateError.BadRequest(`Some of the parents are invalid`);
+        throw CreateError.BadRequest(`Some of the receivers does not exist`);
       }
     }
 
@@ -114,16 +116,16 @@ const createDocument = async (req, res, next) => {
       summary,
       fileList: files,
       relativeDocuments,
+      participants: participantsParsed,
 
       publisher,
-      publishDate,
     });
 
     const savedDocument = await newDocument.save();
 
     return res.status(201).json({
       message: 'Văn bản đã được ban hành thành công',
-      savedDocument,
+      data: savedDocument,
     });
   } catch (error) {
     next(error);
