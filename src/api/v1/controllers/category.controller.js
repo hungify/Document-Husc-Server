@@ -30,7 +30,10 @@ const createCategory = async (req, res, next) => {
     const newCategory = new Category({ title, value, parentId });
     const savedCategory = await newCategory.save();
 
-    return res.status(201).json(savedCategory);
+    return res.status(201).json({
+      message: 'success',
+      data: savedCategory,
+    });
   } catch (error) {
     next(error);
   }
@@ -72,7 +75,10 @@ const updateCategory = async (req, res, next) => {
       { new: true }
     );
 
-    return res.status(200).json(updatedCategory);
+    return res.status(200).json({
+      message: 'success',
+      data: updatedCategory,
+    });
   } catch (error) {
     next(error);
   }
@@ -81,7 +87,10 @@ const updateCategory = async (req, res, next) => {
 const getAllCategories = async (req, res, next) => {
   try {
     const foundCategories = await Category.find({});
-    return res.status(200).json(foundCategories);
+    return res.status(200).json({
+      message: 'success',
+      data: foundCategories,
+    });
   } catch (error) {
     next(error);
   }
