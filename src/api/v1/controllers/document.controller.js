@@ -7,7 +7,7 @@ const User = require('../models/user.model');
 const { UrgentLevel } = require('../models/ugentLevel.model');
 const APICore = require('../libs/apiCore');
 const { uploadFiles } = require('../utils/s3');
-const { populate } = require('../models/document.model');
+const { isJSON } = require('../utils/index');
 
 const createDocument = async (req, res, next) => {
   try {
@@ -25,19 +25,19 @@ const createDocument = async (req, res, next) => {
       content,
       summary,
       relativeDocuments,
-      publisherId,
-      publishDate,
+      publisher,
       participants,
     } = req.body;
 
-    const foundDocument = await Document.findOne({
-      documentNumber,
-    });
-    if (foundDocument) {
-      throw CreateError.Conflict(
-        `Document with documentNumber "${documentNumber}" already exists`
-      );
+    let participantsParsed = null;
+    if (participants) {
+      if (isJSON(participants)) {
+        participantsParsed = JSON.parse(participants);
+      } else {
+        participantsParsed = participants;
+      }
     }
+
     // get reference to typeOfDocument
     const foundTypeOfDocument = await TypeOfDocument.findOne({
       value: typesOfDocument,
@@ -73,32 +73,25 @@ const createDocument = async (req, res, next) => {
 
       if (countValidDocuments !== relativeDocuments?.length) {
         throw CreateError.BadRequest(
-          `Some of the relative documents are invalid`
+          `Some of the relative documents does not exist`
         );
       }
     }
 
-    const foundPublisher = await User.findOne({ _id: publisherId });
+    const foundPublisher = await User.findOne({ _id: publisher });
     if (!foundPublisher) {
-      throw CreateError.BadRequest(`Publisher "${publisherId}" does not exist`);
+      throw CreateError.BadRequest(`Publisher "${publisher}" does not exist`);
     }
 
-    if (participants) {
-      const validSender = User.findOne({ _id: participants[0].senderId });
-      if (!validSender) {
-        throw CreateError.BadRequest(
-          `Sender "${participants[0].senderId}" does not exist`
-        );
-      }
-
+    if (participantsParsed && participantsParsed.receivers.length > 0) {
       const countValidReceivers = await User.countDocuments({
         _id: {
-          $in: participants[0].receivers.map((r) => r.receiverId),
+          $in: participantsParsed?.receivers?.map((r) => r.receiverId),
         },
       });
 
       if (countValidReceivers === 0) {
-        throw CreateError.BadRequest(`Some of the parents are invalid`);
+        throw CreateError.BadRequest(`Some of the receivers does not exist`);
       }
     }
 
@@ -123,14 +116,17 @@ const createDocument = async (req, res, next) => {
       summary,
       fileList: files,
       relativeDocuments,
+      participants: participantsParsed,
 
-      publisherId,
-      publishDate,
+      publisher,
     });
 
     const savedDocument = await newDocument.save();
 
-    return res.status(201).json(savedDocument);
+    return res.status(201).json({
+      message: 'Văn bản đã được ban hành thành công',
+      data: savedDocument,
+    });
   } catch (error) {
     next(error);
   }
