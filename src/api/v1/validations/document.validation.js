@@ -28,16 +28,14 @@ const createDocument = async (req, res, next) => {
 
       documentFrom: Joi.string().valid('input', 'attach').required(),
 
-      participants: Joi.object({
-        senderId: Joi.objectId().required(),
-        sendDate: Joi.date().required(),
-        receivers: Joi.array()
-          .items({
-            receiverId: Joi.objectId().required(),
-          })
-          .default([])
-          .required(),
-      }).required(),
+      participants: Joi.array()
+        .items({
+          sender: Joi.objectId().required(),
+          sendDate: Joi.date().required(),
+          receiver: Joi.objectId().required(),
+          readDate: Joi.date().default(null),
+        })
+        .required(),
     })
     .when('.documentFrom', {
       is: 'input',
@@ -94,13 +92,15 @@ const getListDocuments = async (req, res, next) => {
 
 const forwardDocument = async (req, res, next) => {
   const documentSchema = Joi.object().keys({
-    receiverId: Joi.array().items(Joi.objectId().required()),
-    parentId: Joi.objectId().required(),
-    readDate: Joi.date().default(null),
-    forwardedDate: Joi.date().required(),
+    receivers: Joi.array().items({
+      receiverId: Joi.objectId().required(),
+      readDate: Joi.date().default(null),
+      sendDate: Joi.date().required(),
+    }),
   });
   try {
     await documentSchema.validateAsync(req.body);
+    next();
   } catch (error) {
     next(CreateError.BadRequest(error.message));
   }
