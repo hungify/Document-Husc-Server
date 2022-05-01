@@ -6,7 +6,7 @@ const createAgency = async (req, res, next) => {
   try {
     const { label } = req.body;
 
-    const foundAgency = await Agency.findOne({ label });
+    const foundAgency = await Agency.findOne({ label }).lean();
 
     if (foundAgency) {
       throw CreateError.Conflict(`Agency with value "${label}" already exists`);
@@ -36,18 +36,23 @@ const updateAgency = async (req, res, next) => {
     const { label } = req.body;
     const { agencyId } = req.params;
 
-    const foundAgency = await Agency.findById(agencyId);
+    const foundAgency = await Agency.findById(agencyId).lean();
     if (!foundAgency) {
       throw CreateError.NotFound(`Agency with id "${agencyId}" not found`);
     }
 
-    const foundAgencyWithSameLabel = await Agency.findOne({ label });
+    const foundAgencyWithSameLabel = await Agency.findOne({ label }).lean();
 
     if (foundAgencyWithSameLabel && foundAgencyWithSameLabel.id !== agencyId) {
       throw CreateError.Conflict(`Agency with value "${label}" already exists`);
     }
 
-    const value = label;
+    const value = label
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[đĐ]/g, (m) => (m === 'đ' ? 'd' : 'D'))
+      .replace(/\s/g, '-');
     const updatedAgency = await Agency.findByIdAndUpdate(
       agencyId,
       { label, value },
@@ -78,7 +83,7 @@ const deleteAgency = async (req, res, next) => {
 
 const getAllAgencies = async (req, res, next) => {
   try {
-    const foundAgencies = await Agency.find({});
+    const foundAgencies = await Agency.find({}).lean();
     return res.status(200).json({
       message: 'success',
       data: foundAgencies,
