@@ -5,7 +5,9 @@ const getAllUsers = async (req, res, next) => {
   try {
     const users = await User.find({})
       .select('-password -__v -createdAt -updatedAt')
-      .populate('department', 'label');
+      .populate('department', 'label')
+      .lean();
+
     res.status(200).json({
       message: 'success',
       data: users,

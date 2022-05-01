@@ -35,7 +35,8 @@ const updateTypesOfDocuments = async (req, res, next) => {
     const { typesOfDocumentId } = req.params;
     const foundTypesOfDocument = await TypeOfDocument.findById(
       typesOfDocumentId
-    );
+    ).lean();
+    
     if (!foundTypesOfDocument) {
       throw CreateError.NotFound(
         `TypeOfDocument with typesOfDocumentId "${typesOfDocumentId}" not found`
@@ -44,7 +45,7 @@ const updateTypesOfDocuments = async (req, res, next) => {
 
     const foundTypesOfDocumentWithSameLabel = await TypeOfDocument.findOne({
       label,
-    });
+    }).lean();
     if (
       foundTypesOfDocumentWithSameLabel &&
       foundTypesOfDocumentWithSameLabel._id !== typesOfDocumentId
@@ -54,7 +55,13 @@ const updateTypesOfDocuments = async (req, res, next) => {
       );
     }
 
-    const value = label;
+    const value = label
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[đĐ]/g, (m) => (m === 'đ' ? 'd' : 'D'))
+      .replace(/\s/g, '-');
+
     const updatedTypesOfDocument = await TypeOfDocument.findByIdAndUpdate(
       typesOfDocumentId,
       { label, value },
@@ -72,7 +79,7 @@ const updateTypesOfDocuments = async (req, res, next) => {
 
 const getAllTypesOfDocuments = async (req, res, next) => {
   try {
-    const foundTypesOfDocuments = await TypeOfDocument.find({});
+    const foundTypesOfDocuments = await TypeOfDocument.find({}).lean();
     return res.status(200).json({
       message: 'success',
       data: foundTypesOfDocuments,
