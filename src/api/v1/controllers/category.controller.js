@@ -4,7 +4,7 @@ const Category = require('../models/category.model');
 const createCategory = async (req, res, next) => {
   try {
     const { title, parentId } = req.body;
-    const foundCategory = await Category.findOne({ title });
+    const foundCategory = await Category.findOne({ title }).lean();
     if (foundCategory) {
       throw CreateError.Conflict(
         `Category with value "${title}" already exists`
@@ -13,7 +13,7 @@ const createCategory = async (req, res, next) => {
     if (parentId) {
       const foundCategoryWithSameParentId = await Category.findOne({
         _id: parentId,
-      });
+      }).lean();
 
       if (!foundCategoryWithSameParentId && parentId !== null) {
         throw CreateError.Conflict(
@@ -50,7 +50,7 @@ const updateCategory = async (req, res, next) => {
       );
     }
 
-    const foundCategoryWithSameTitle = await Category.findOne({ title });
+    const foundCategoryWithSameTitle = await Category.findOne({ title }).lean();
     if (
       foundCategoryWithSameTitle &&
       foundCategoryWithSameTitle._id !== categoryId
@@ -62,18 +62,23 @@ const updateCategory = async (req, res, next) => {
 
     const foundCategoryWithSameParentId = await Category.findOne({
       _id: parentId,
-    });
+    }).lean();
     if (!foundCategoryWithSameParentId && parentId !== null) {
       throw CreateError.Conflict(
         `Category with parentId "${parentId}" not found`
       );
     }
-
+    const value = title
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[đĐ]/g, (m) => (m === 'đ' ? 'd' : 'D'))
+      .replace(/\s/g, '-');
     const updatedCategory = await Category.findByIdAndUpdate(
       categoryId,
-      { title, parentId },
+      { title, value, parentId },
       { new: true }
-    );
+    ).lean();
 
     return res.status(200).json({
       message: 'success',
@@ -86,7 +91,7 @@ const updateCategory = async (req, res, next) => {
 
 const getAllCategories = async (req, res, next) => {
   try {
-    const foundCategories = await Category.find({});
+    const foundCategories = await Category.find({}).lean();
     return res.status(200).json({
       message: 'success',
       data: foundCategories,
