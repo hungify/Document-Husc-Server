@@ -75,6 +75,10 @@ const documentSchema = new mongoose.Schema(
     participants: [
       {
         _id: false,
+        root: {
+          type: Boolean,
+          default: true,
+        },
         senderId: {
           ref: 'Users',
           type: mongoose.Schema.Types.ObjectId,
@@ -118,6 +122,36 @@ const documentSchema = new mongoose.Schema(
 );
 
 documentSchema.index({ title: 'text', documentNumber: 'text' });
+
+documentSchema.statics = {
+  searchPartial: function (q, callback) {
+    return this.find(
+      {
+        $or: [{ title: new RegExp(q, 'gi') }, { body: new RegExp(q, 'gi') }],
+      },
+      callback
+    );
+  },
+  searchFull: function (q, callback) {
+    return this.find(
+      {
+        $text: { $search: q, $caseSensitive: false },
+      },
+      callback
+    );
+  },
+  search: async function (q, callback) {
+    const documents = await this.searchFull(q);
+    const partialDocuments = await this.searchPartial(q);
+    if (documents.length > 0) {
+      return documents;
+    } else if (partialDocuments.length > 0) {
+      return partialDocuments;
+    } else {
+      return [];
+    }
+  },
+};
 
 const Document = connectToMongoLocal.model('Documents', documentSchema);
 Document.createIndexes();
