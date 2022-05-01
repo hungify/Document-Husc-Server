@@ -22,26 +22,18 @@ module.exports = {
       }
     });
   },
-  toMap: (arr, childKey, nestedKey) => {
-    const result = arr.reduce((prev, current) => {
-      const key = current[childKey][nestedKey].toString();
-      prev[key] = current;
+
+  toMap: (data, key) => {
+    return data.reduce((prev, current) => {
+      prev[current[key]] = current;
       return prev;
     }, {});
-    return result;
   },
-  listToTree: (
-    arr,
-    childKey = 'childId',
-    parentKey = 'parentId',
-    wrapKey = 'children',
-    nestedKey = ''
-  ) => {
-    const map = module.exports.toMap(arr, childKey, nestedKey);
+  listToTree: (arr, childKey, parentKey, wrapKey) => {
+    const map = module.exports.toMap(arr, childKey);
     return arr.reduce((acc, current) => {
-      const key = current[parentKey][nestedKey].toString();
-
-      if (map[key]) {
+      const key = current[parentKey];
+      if (key) {
         map[key][wrapKey] = map[key][wrapKey] || [];
         map[key][wrapKey].push(current);
       } else {
