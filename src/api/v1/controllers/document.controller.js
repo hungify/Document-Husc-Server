@@ -24,7 +24,7 @@ const createDocument = async (req, res, next) => {
       title,
       content,
       summary,
-      relatedDocuments,
+      relativeDocuments,
       publisher,
       participants,
     } = req.body;
@@ -66,12 +66,12 @@ const createDocument = async (req, res, next) => {
       );
     }
 
-    if (relatedDocuments) {
+    if (relativeDocuments) {
       const countValidDocuments = await Document.countDocuments({
-        _id: { $in: relatedDocuments },
+        _id: { $in: relativeDocuments },
       }).exec();
 
-      if (countValidDocuments !== relatedDocuments?.length) {
+      if (countValidDocuments !== relativeDocuments?.length) {
         throw CreateError.BadRequest(
           `Some of the relative documents does not exist`
         );
@@ -83,10 +83,10 @@ const createDocument = async (req, res, next) => {
       throw CreateError.BadRequest(`Publisher "${publisher}" does not exist`);
     }
 
-    if (participantsParsed && participantsParsed.length > 0) {
+    if (participantsParsed && participantsParsed.receivers.length > 0) {
       const countValidReceivers = await User.countDocuments({
         _id: {
-          $in: participantsParsed?.map((r) => r.receiver),
+          $in: participantsParsed?.receivers?.map((r) => r.receiverId),
         },
       });
 
@@ -99,7 +99,7 @@ const createDocument = async (req, res, next) => {
     if (req.files) {
       files = await uploadFiles(req.files);
     }
-    participantsParsed.root = true;
+
     const newDocument = new Document({
       //properties
       title,
@@ -115,7 +115,7 @@ const createDocument = async (req, res, next) => {
       content,
       summary,
       fileList: files,
-      relatedDocuments,
+      relativeDocuments,
       participants: participantsParsed,
 
       publisher,
@@ -181,8 +181,16 @@ const getDocumentDetail = async (req, res, next) => {
       .populate('urgentLevel', 'label value colorTag -_id')
       .populate('typesOfDocument', 'label value -_id')
       .populate('publisher', 'username -_id')
+      .populate({
+        path: 'participants.receivers.receiverId',
+        select: 'username avatar receiverId _id',
+      })
+      .populate({
+        path: 'participants.senderId',
+        select: 'username avatar _id',
+      })
       .select('-__v -createdAt -updatedAt')
-      .lean({ autopopulate: true });
+      .lean();
 
     if (!foundDocument) {
       throw CreateError.NotFound(`Document "${documentId}" does not exist`);
@@ -199,18 +207,17 @@ const getDocumentDetail = async (req, res, next) => {
       title,
       content,
       summary,
-      participants,
-      relatedDocuments,
-      fileList,
     } = foundDocument;
 
-    const participantsTree = listToTree(
-      participants,
-      'receiver',
-      'sender',
-      'children',
-      '_id'
-    );
+    // const participants = foundDocument.participants.map((p) => {
+    //   console.log('🚀 :: p.senderId._id', p.senderId._id);
+    //   if (p.senderId._id.toString() === publisher._id.toString()) {
+    //     return {
+    //       ...p,
+    //       root: true,
+    //     };
+    //   } else return p;
+    // });
 
     const result = {
       property: {
@@ -225,9 +232,9 @@ const getDocumentDetail = async (req, res, next) => {
         content,
         summary,
       },
-      files: fileList,
-      participants: participantsTree,
-      relatedDocuments: relatedDocuments,
+      files: foundDocument.fileList,
+      participants: foundDocument.participants,
+      relatedDocuments: foundDocument.relativeDocuments,
     };
 
     return res.status(200).json({
@@ -295,7 +302,7 @@ const updateReadDate = async (req, res, next) => {
 const forwardDocument = async (req, res, next) => {
   try {
     const { documentId, senderId } = req.params;
-    const { receivers } = req.body;
+    const { receivers, forwardDate } = req.body;
 
     const foundDocument = await Document.findOne({ _id: documentId });
     if (!foundDocument) {
@@ -307,36 +314,60 @@ const forwardDocument = async (req, res, next) => {
       throw CreateError.NotFound(`Sender "${senderId}" does not exist`);
     }
 
-    const countValidReceivers = await User.countDocuments({
-      _id: { $in: receivers.map((r) => r.receiverId) },
-    });
-    if (countValidReceivers !== receivers.length) {
-      throw CreateError.BadRequest(
-        `Receivers "${receivers.map((r) => r.receiverId)}" does not exist`
-      );
-    }
-
-    const forwardedDocument = await Document.findOneAndUpdate(
+    const isExistSender = await Document.findOne(
       {
         _id: documentId,
-        'participants.$.sender': senderId,
+        'participants.senderId': senderId,
       },
       {
-        $addToSet: {
-          participants: {
-            $each: receivers.map((r) => ({
-              sender: senderId,
-              receiver: r.receiverId,
-              sendDate: r.sendDate,
+        'participants.$': 1,
+      }
+    );
+    if (isExistSender) {
+      // sender is already in participants
+      const updatedNewReceivers = await Document.findOneAndUpdate(
+        {
+          _id: documentId,
+          'participants.senderId': senderId,
+        },
+        {
+          $addToSet: {
+            'participants.$.forwardDate': forwardDate,
+            'participants.$.receivers': receivers.map((r) => ({
+              receiverId: r,
+              readDate: null,
             })),
           },
         },
-      }
-    );
-    return res.status(200).json({
-      message: 'success',
-      data: forwardedDocument,
-    });
+        {
+          new: true,
+        }
+      ).exec();
+      return res.status(200).json(updatedNewReceivers);
+    } else {
+      const forwardedDocument = await Document.findOneAndUpdate(
+        {
+          _id: documentId,
+        },
+        {
+          $push: {
+            participants: [
+              {
+                senderId: senderId,
+                receivers: receivers.map((r) => ({
+                  receiverId: r,
+                  readDate: null,
+                })),
+              },
+            ],
+          },
+        },
+        {
+          new: true,
+        }
+      ).exec();
+      return res.status(200).json(forwardedDocument);
+    }
   } catch (error) {
     next(error);
   }
