@@ -7,7 +7,7 @@ const User = require('../models/user.model');
 const { UrgentLevel } = require('../models/ugentLevel.model');
 const APICore = require('../libs/apiCore');
 const { uploadFiles } = require('../utils/s3');
-const { isJSON } = require('../utils/index');
+const { isJSON, removeEmptyObjInArrByKeys, listToTree } = require('../utils');
 
 const createDocument = async (req, res, next) => {
   try {
@@ -134,7 +134,7 @@ const createDocument = async (req, res, next) => {
 
 const getListDocuments = async (req, res, next) => {
   try {
-    const api = new APICore(req.query, Document.find({}))
+    const api = new APICore(req.query, Document)
       .paginating()
       .sorting()
       .searching()
@@ -142,27 +142,30 @@ const getListDocuments = async (req, res, next) => {
 
     const result = await Promise.allSettled([
       api.query
-        .populate('agency', 'label value -_id')
-        .populate('category', 'title value -_id')
-        .populate('urgentLevel', 'label value colorTag -_id')
-        .populate('typesOfDocument', 'label value -_id')
         .populate('publisher', 'username -_id')
         .select(
           'agency category urgentLevel typesOfDocument documentNumber title signer issueDate fileList'
-        ),
+        )
+        .lean(),
       Document.countDocuments({}),
     ]);
 
     const documents = result[0].status === 'fulfilled' ? result[0].value : [];
     const total = result[1].status === 'fulfilled' ? result[1].value : 0;
-    const realDocs = documents.filter((d) => d.category); //populate will be null if filter is't match
+
+    const keysPopulate = [
+      'agency',
+      'category',
+      'urgentLevel',
+      'typesOfDocument',
+    ];
+
+    const realDocs = removeEmptyObjInArrByKeys(documents, keysPopulate);
 
     return res.status(200).json({
       total,
       totalMatch: realDocs.length,
-      documents: realDocs,
-
-      documents: documents,
+      data: realDocs,
     });
   } catch (error) {
     next(error);
@@ -173,14 +176,21 @@ const getDocumentDetail = async (req, res, next) => {
   try {
     const { documentId } = req.params;
     const foundDocument = await Document.findOne({ _id: documentId })
-      .select('-__v')
       .populate('agency', 'label value -_id')
       .populate('category', 'title value -_id')
       .populate('urgentLevel', 'label value colorTag -_id')
       .populate('typesOfDocument', 'label value -_id')
       .populate('publisher', 'username -_id')
+      .populate({
+        path: 'participants.receivers.receiverId',
+        select: 'username avatar receiverId _id',
+      })
+      .populate({
+        path: 'participants.senderId',
+        select: 'username avatar _id',
+      })
       .select('-__v -createdAt -updatedAt')
-      .exec();
+      .lean();
 
     if (!foundDocument) {
       throw CreateError.NotFound(`Document "${documentId}" does not exist`);
@@ -198,6 +208,16 @@ const getDocumentDetail = async (req, res, next) => {
       content,
       summary,
     } = foundDocument;
+
+    // const participants = foundDocument.participants.map((p) => {
+    //   console.log('🚀 :: p.senderId._id', p.senderId._id);
+    //   if (p.senderId._id.toString() === publisher._id.toString()) {
+    //     return {
+    //       ...p,
+    //       root: true,
+    //     };
+    //   } else return p;
+    // });
 
     const result = {
       property: {
@@ -217,7 +237,10 @@ const getDocumentDetail = async (req, res, next) => {
       relatedDocuments: foundDocument.relativeDocuments,
     };
 
-    return res.status(200).json(result);
+    return res.status(200).json({
+      message: 'success',
+      data: result,
+    });
   } catch (error) {
     next(error);
   }

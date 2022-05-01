@@ -1,5 +1,6 @@
 const app = require('./src/api/v1/app');
 const http = require('http');
+const _ = require('lodash');
 const { port } = require('./src/configs/env.config');
 const {
   normalizePort,
