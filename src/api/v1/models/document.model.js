@@ -60,7 +60,7 @@ const documentSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    relativeDocuments: [
+    relatedDocuments: [
       {
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'Documents',
@@ -75,33 +75,26 @@ const documentSchema = new mongoose.Schema(
     participants: [
       {
         _id: false,
-        root: {
-          type: Boolean,
-          default: true,
-        },
-        senderId: {
+        sender: {
           ref: 'Users',
           type: mongoose.Schema.Types.ObjectId,
           required: true,
+          autopopulate: { select: 'username avatar ' },
         },
         sendDate: {
           type: Date,
           default: null,
         },
-        receivers: [
-          {
-            _id: false,
-            readDate: {
-              type: Date,
-              default: null,
-            },
-            receiverId: {
-              ref: 'Users',
-              type: mongoose.Schema.Types.ObjectId,
-              required: true,
-            },
-          },
-        ],
+        readDate: {
+          type: Date,
+          default: null,
+        },
+        receiver: {
+          ref: 'Users',
+          type: mongoose.Schema.Types.ObjectId,
+          required: true,
+          autopopulate: { select: 'username avatar ' },
+        },
       },
     ],
     fileList: [
@@ -122,7 +115,7 @@ const documentSchema = new mongoose.Schema(
 );
 
 documentSchema.index({ title: 'text', documentNumber: 'text' });
-
+documentSchema.plugin(require('mongoose-autopopulate'));
 documentSchema.statics = {
   searchPartial: function (q, callback) {
     return this.find(

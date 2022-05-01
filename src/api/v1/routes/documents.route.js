@@ -19,15 +19,12 @@ router
   .route('/:documentId')
   .get(paramValidation.objectId, documentController.getDocumentDetail);
 
-router.route('/:documentId/receivers/:senderId/:receiverId').put(
-  // paramValidation.objectId,
-  documentValidation.updateReadDate,
-  documentController.updateReadDate
-);
+router
+  .route('/:documentId/receivers/:senderId/:receiverId')
+  .put(documentValidation.updateReadDate, documentController.updateReadDate);
 
-router.route('/:documentId/forward/:senderId').put(
-  // paramValidation.objectId,
-  documentController.forwardDocument
-);
+router
+  .route('/:documentId/forward/:senderId')
+  .put(documentValidation.forwardDocument, documentController.forwardDocument);
 
 module.exports = router;
