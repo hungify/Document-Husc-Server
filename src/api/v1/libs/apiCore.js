@@ -16,7 +16,6 @@ function filterByReferenceFields(queryObject) {
       match: { value: values[keys.indexOf(key)] },
     };
   });
-  console.log('🚀 :: populates', populates);
 
   return populates;
 }
