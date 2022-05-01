@@ -4,7 +4,7 @@ const { UrgentLevel } = require('../models/ugentLevel.model');
 const createUrgentLevel = async (req, res, next) => {
   try {
     const { label, colorTag } = req.body;
-    const foundUrgentLevel = await UrgentLevel.findOne({ label });
+    const foundUrgentLevel = await UrgentLevel.findOne({ label }).lean();
     if (foundUrgentLevel) {
       throw CreateError.Conflict(
         `UrgentLevel with value "${label}" already exists`
@@ -33,14 +33,17 @@ const updateUrgentLevel = async (req, res, next) => {
     const { label, colorTag } = req.body;
     const { urgentLevelId } = req.params;
 
-    const foundUrgentLevel = await UrgentLevel.findById(urgentLevelId);
+    const foundUrgentLevel = await UrgentLevel.findById(urgentLevelId).lean();
     if (!foundUrgentLevel) {
       throw CreateError.NotFound(
         `UrgentLevel with id "${urgentLevelId}" not found`
       );
     }
 
-    const foundUrgentLevelWithSameLabel = await UrgentLevel.findOne({ label });
+    const foundUrgentLevelWithSameLabel = await UrgentLevel.findOne({
+      label,
+    }).lean();
+
     if (
       foundUrgentLevelWithSameLabel &&
       foundUrgentLevelWithSameLabel._id !== urgentLevelId
@@ -50,7 +53,13 @@ const updateUrgentLevel = async (req, res, next) => {
       );
     }
 
-    const value = label;
+    const value = label
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[đĐ]/g, (m) => (m === 'đ' ? 'd' : 'D'))
+      .replace(/\s/g, '-');
+
     const updatedUrgentLevel = await UrgentLevel.findByIdAndUpdate(
       urgentLevelId,
       { label, value, colorTag },
@@ -67,7 +76,7 @@ const updateUrgentLevel = async (req, res, next) => {
 
 const getAllUrgentLevels = async (req, res, next) => {
   try {
-    const foundUrgentLevels = await UrgentLevel.find({});
+    const foundUrgentLevels = await UrgentLevel.find({}).lean();
     return res.status(200).json({
       message: 'success',
       data: foundUrgentLevels,
