@@ -176,6 +176,7 @@ const getListDocuments = async (req, res, next) => {
 const getDocumentDetail = async (req, res, next) => {
   try {
     const { documentId } = req.params;
+    const { tab } = req.query;
     const foundDocument = await Document.findOne({ _id: documentId })
       .populate('agency', 'label value -_id')
       .populate('category', 'title value -_id')
@@ -188,7 +189,6 @@ const getDocumentDetail = async (req, res, next) => {
     if (!foundDocument) {
       throw CreateError.NotFound(`Document "${documentId}" does not exist`);
     }
-
     const {
       agency,
       category,
@@ -205,17 +205,31 @@ const getDocumentDetail = async (req, res, next) => {
       fileList,
       publisher,
     } = foundDocument;
-
-    const participantsTree = listToTree(
-      participants,
-      'receiver',
-      'sender',
-      'children',
-      '_id'
-    );
-
-    const result = {
-      property: {
+    let result = [];
+    if (tab === 'participants') {
+      const tree = listToTree(
+        participants,
+        'receiver',
+        'sender',
+        'children',
+        '_id'
+      );
+      const participantsTree = [
+        {
+          root: true,
+          receiver: {
+            username: publisher.username,
+            _id: publisher._id,
+            issueDate,
+          },
+          children: tree,
+        },
+      ];
+      result = participantsTree;
+    } else if (tab === 'relatedDocuments') {
+      result = relatedDocuments;
+    } else if (tab === 'property') {
+      result = {
         agency,
         category,
         typesOfDocument,
@@ -227,11 +241,41 @@ const getDocumentDetail = async (req, res, next) => {
         content,
         summary,
         publisher,
-      },
-      files: fileList,
-      participants: participantsTree,
-      relatedDocuments: relatedDocuments,
-    };
+      };
+    } else if (tab === 'files') {
+      result = fileList;
+    } else if (tab === 'analytics') {
+      let read = [];
+      let unread = [];
+
+      _.forEach(participants, (p) => {
+        if (p.readDate) {
+          read.push({
+            username: p.receiver.username,
+            _id: p.receiver._id,
+            readDate: p.readDate,
+          });
+        } else {
+          unread.push({
+            username: p.receiver.username,
+            _id: p.receiver._id,
+          });
+        }
+      });
+
+      result = {
+        read: {
+          users: read,
+          count: read.length,
+        },
+        unread: {
+          users: unread,
+          count: unread.length,
+        },
+      };
+    } else {
+      result = foundDocument;
+    }
 
     return res.status(200).json({
       message: 'success',
@@ -244,7 +288,7 @@ const getDocumentDetail = async (req, res, next) => {
 
 const updateReadDate = async (req, res, next) => {
   try {
-    const { documentId, receiverId, senderId } = req.params;
+    const { documentId, receiverId } = req.params;
 
     const { readDate } = req.body;
 
@@ -258,36 +302,24 @@ const updateReadDate = async (req, res, next) => {
       throw CreateError.NotFound(`Receiver "${receiverId}" does not exist`);
     }
 
-    const foundSender = User.findOne({ _id: senderId });
-    if (!foundSender) {
-      throw CreateError.NotFound(`Sender "${senderId}" does not exist`);
-    }
-
     const updateReadDocument = await Document.findOneAndUpdate(
       {
         _id: documentId,
         participants: {
           $elemMatch: {
-            senderId: senderId,
+            receiver: receiverId,
           },
         },
       },
       {
         $set: {
-          'participants.$[elm1].receivers.$[elm2].readDate': readDate,
+          'participants.$.readDate': new Date(readDate).toLocaleDateString(),
         },
       },
       {
-        arrayFilters: [
-          {
-            'elm1.senderId': senderId,
-          },
-          {
-            'elm2.receiverId': receiverId,
-          },
-        ],
+        new: true,
       }
-    ).exec();
+    ).lean();
 
     return res.status(200).json(updateReadDocument);
   } catch (error) {

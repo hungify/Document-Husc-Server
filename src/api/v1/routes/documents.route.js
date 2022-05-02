@@ -20,7 +20,7 @@ router
   .get(paramValidation.objectId, documentController.getDocumentDetail);
 
 router
-  .route('/:documentId/receivers/:senderId/:receiverId')
+  .route('/:documentId/receiver/:receiverId')
   .put(documentValidation.updateReadDate, documentController.updateReadDate);
 
 router
