@@ -19,11 +19,10 @@ router
   .route('/:documentId')
   .get(paramValidation.objectId, documentController.getDocumentDetail);
 
-router.route('/:documentId/receivers/:senderId/:receiverId').put(
-  // paramValidation.objectId,
-  documentValidation.updateReadDate,
-  documentController.updateReadDate
-);
+router
+  .route('/:documentId/receiver/:receiverId')
+  .put(documentValidation.updateReadDate, documentController.updateReadDate);
+
 
 router.route('/:documentId/forward/:senderId').put(
   // paramValidation.objectId,
