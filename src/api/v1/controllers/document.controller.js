@@ -25,7 +25,7 @@ const createDocument = async (req, res, next) => {
       title,
       content,
       summary,
-      relativeDocuments,
+      relatedDocuments,
       publisher,
       participants,
     } = req.body;
@@ -67,12 +67,12 @@ const createDocument = async (req, res, next) => {
       );
     }
 
-    if (relativeDocuments) {
+    if (relatedDocuments) {
       const countValidDocuments = await Document.countDocuments({
-        _id: { $in: relativeDocuments },
+        _id: { $in: relatedDocuments },
       }).exec();
 
-      if (countValidDocuments !== relativeDocuments?.length) {
+      if (countValidDocuments !== relatedDocuments?.length) {
         throw CreateError.BadRequest(
           `Some of the relative documents does not exist`
         );
@@ -84,10 +84,10 @@ const createDocument = async (req, res, next) => {
       throw CreateError.BadRequest(`Publisher "${publisher}" does not exist`);
     }
 
-    if (participantsParsed && participantsParsed.receivers.length > 0) {
+    if (participantsParsed && participantsParsed.length > 0) {
       const countValidReceivers = await User.countDocuments({
         _id: {
-          $in: participantsParsed?.receivers?.map((r) => r.receiverId),
+          $in: participantsParsed?.map((r) => r.receiver),
         },
       });
 
@@ -100,7 +100,7 @@ const createDocument = async (req, res, next) => {
     if (req.files) {
       files = await uploadFiles(req.files);
     }
-
+    participantsParsed.root = true;
     const newDocument = new Document({
       //properties
       title,
@@ -116,7 +116,7 @@ const createDocument = async (req, res, next) => {
       content,
       summary,
       fileList: files,
-      relativeDocuments,
+      relatedDocuments,
       participants: participantsParsed,
 
       publisher,
@@ -176,6 +176,7 @@ const getListDocuments = async (req, res, next) => {
 const getDocumentDetail = async (req, res, next) => {
   try {
     const { documentId } = req.params;
+    const { tab } = req.query;
     const foundDocument = await Document.findOne({ _id: documentId })
       .populate('agency', 'label value -_id')
       .populate('category', 'title value -_id')
@@ -183,12 +184,11 @@ const getDocumentDetail = async (req, res, next) => {
       .populate('typesOfDocument', 'label value -_id')
       .populate('publisher', 'username _id')
       .select('-__v -createdAt -updatedAt')
-      .lean();
+      .lean({ autopopulate: true });
 
     if (!foundDocument) {
       throw CreateError.NotFound(`Document "${documentId}" does not exist`);
     }
-
     const {
       agency,
       category,
@@ -205,19 +205,31 @@ const getDocumentDetail = async (req, res, next) => {
       fileList,
       publisher,
     } = foundDocument;
-
-    // const participants = foundDocument.participants.map((p) => {
-    //   console.log('🚀 :: p.senderId._id', p.senderId._id);
-    //   if (p.senderId._id.toString() === publisher._id.toString()) {
-    //     return {
-    //       ...p,
-    //       root: true,
-    //     };
-    //   } else return p;
-    // });
-
-    const result = {
-      property: {
+    let result = [];
+    if (tab === 'participants') {
+      const tree = listToTree(
+        participants,
+        'receiver',
+        'sender',
+        'children',
+        '_id'
+      );
+      const participantsTree = [
+        {
+          root: true,
+          receiver: {
+            username: publisher.username,
+            _id: publisher._id,
+            issueDate,
+          },
+          children: tree,
+        },
+      ];
+      result = participantsTree;
+    } else if (tab === 'relatedDocuments') {
+      result = relatedDocuments;
+    } else if (tab === 'property') {
+      result = {
         agency,
         category,
         typesOfDocument,
@@ -229,11 +241,41 @@ const getDocumentDetail = async (req, res, next) => {
         content,
         summary,
         publisher,
-      },
-      files: foundDocument.fileList,
-      participants: foundDocument.participants,
-      relatedDocuments: foundDocument.relativeDocuments,
-    };
+      };
+    } else if (tab === 'files') {
+      result = fileList;
+    } else if (tab === 'analytics') {
+      let read = [];
+      let unread = [];
+
+      _.forEach(participants, (p) => {
+        if (p.readDate) {
+          read.push({
+            username: p.receiver.username,
+            _id: p.receiver._id,
+            readDate: p.readDate,
+          });
+        } else {
+          unread.push({
+            username: p.receiver.username,
+            _id: p.receiver._id,
+          });
+        }
+      });
+
+      result = {
+        read: {
+          users: read,
+          count: read.length,
+        },
+        unread: {
+          users: unread,
+          count: unread.length,
+        },
+      };
+    } else {
+      result = foundDocument;
+    }
 
     return res.status(200).json({
       message: 'success',
@@ -246,7 +288,7 @@ const getDocumentDetail = async (req, res, next) => {
 
 const updateReadDate = async (req, res, next) => {
   try {
-    const { documentId, receiverId, senderId } = req.params;
+    const { documentId, receiverId } = req.params;
 
     const { readDate } = req.body;
 
@@ -260,36 +302,24 @@ const updateReadDate = async (req, res, next) => {
       throw CreateError.NotFound(`Receiver "${receiverId}" does not exist`);
     }
 
-    const foundSender = User.findOne({ _id: senderId });
-    if (!foundSender) {
-      throw CreateError.NotFound(`Sender "${senderId}" does not exist`);
-    }
-
     const updateReadDocument = await Document.findOneAndUpdate(
       {
         _id: documentId,
         participants: {
           $elemMatch: {
-            senderId: senderId,
+            receiver: receiverId,
           },
         },
       },
       {
         $set: {
-          'participants.$[elm1].receivers.$[elm2].readDate': readDate,
+          'participants.$.readDate': new Date(readDate).toLocaleDateString(),
         },
       },
       {
-        arrayFilters: [
-          {
-            'elm1.senderId': senderId,
-          },
-          {
-            'elm2.receiverId': receiverId,
-          },
-        ],
+        new: true,
       }
-    ).exec();
+    ).lean();
 
     return res.status(200).json(updateReadDocument);
   } catch (error) {
@@ -300,7 +330,7 @@ const updateReadDate = async (req, res, next) => {
 const forwardDocument = async (req, res, next) => {
   try {
     const { documentId, senderId } = req.params;
-    const { receivers, forwardDate } = req.body;
+    const { receivers } = req.body;
 
     const foundDocument = await Document.findOne({ _id: documentId });
     if (!foundDocument) {
@@ -345,7 +375,7 @@ const forwardDocument = async (req, res, next) => {
     await Document.updateOne(
       {
         _id: documentId,
-        'participants.senderId': senderId,
+        'participants.$.sender': senderId,
       },
       {
         $addToSet: {
