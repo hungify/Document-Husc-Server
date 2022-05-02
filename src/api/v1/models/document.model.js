@@ -122,6 +122,7 @@ const documentSchema = new mongoose.Schema(
 );
 
 documentSchema.index({ title: 'text', documentNumber: 'text' });
+documentSchema.plugin(require('mongoose-autopopulate'));
 
 documentSchema.statics = {
   searchPartial: function (q, callback) {
