@@ -32,7 +32,8 @@ module.exports = {
   listToTree: (arr, childKey, parentKey, wrapKey) => {
     const map = module.exports.toMap(arr, childKey);
     return arr.reduce((acc, current) => {
-      const key = current[parentKey];
+      const key = current[parentKey][nestedKey].toString();
+      delete current[parentKey];
       if (key) {
         map[key][wrapKey] = map[key][wrapKey] || [];
         map[key][wrapKey].push(current);
