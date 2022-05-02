@@ -8,6 +8,7 @@ const { UrgentLevel } = require('../models/ugentLevel.model');
 const APICore = require('../libs/apiCore');
 const { uploadFiles } = require('../utils/s3');
 const { isJSON, removeEmptyObjInArrByKeys, listToTree } = require('../utils');
+const _ = require('lodash');
 
 const createDocument = async (req, res, next) => {
   try {
@@ -180,15 +181,7 @@ const getDocumentDetail = async (req, res, next) => {
       .populate('category', 'title value -_id')
       .populate('urgentLevel', 'label value colorTag -_id')
       .populate('typesOfDocument', 'label value -_id')
-      .populate('publisher', 'username -_id')
-      .populate({
-        path: 'participants.receivers.receiverId',
-        select: 'username avatar receiverId _id',
-      })
-      .populate({
-        path: 'participants.senderId',
-        select: 'username avatar _id',
-      })
+      .populate('publisher', 'username _id')
       .select('-__v -createdAt -updatedAt')
       .lean();
 
@@ -207,6 +200,10 @@ const getDocumentDetail = async (req, res, next) => {
       title,
       content,
       summary,
+      participants,
+      relatedDocuments,
+      fileList,
+      publisher,
     } = foundDocument;
 
     // const participants = foundDocument.participants.map((p) => {
@@ -231,6 +228,7 @@ const getDocumentDetail = async (req, res, next) => {
         title,
         content,
         summary,
+        publisher,
       },
       files: foundDocument.fileList,
       participants: foundDocument.participants,
@@ -314,60 +312,64 @@ const forwardDocument = async (req, res, next) => {
       throw CreateError.NotFound(`Sender "${senderId}" does not exist`);
     }
 
-    const isExistSender = await Document.findOne(
+    const countValidReceivers = await User.countDocuments({
+      _id: { $in: receivers.map((r) => r.receiverId) },
+    });
+    if (countValidReceivers !== receivers.length) {
+      throw CreateError.BadRequest(
+        `Receivers "${receivers.map((r) => r.receiverId)}" does not exist`
+      );
+    }
+
+    const existReceivers = await Document.find({
+      _id: documentId,
+      'participants.$.receiver': { $in: receivers.map((r) => r.receiverId) },
+    }).lean({ autopopulate: true });
+
+    let validReceivers = { ...receivers };
+    let invalidReceivers = [];
+
+    if (existReceivers.length > 0) {
+      validReceivers = _.filter(receivers, (r) => {
+        return !_.find(existReceivers[0].participants, (p) => {
+          return p.receiver._id.toString() === r.receiverId;
+        });
+      });
+      invalidReceivers = _.filter(receivers, (r) => {
+        return _.find(existReceivers[0].participants, (p) => {
+          return p.receiver._id.toString() === r.receiverId;
+        });
+      });
+    }
+
+    await Document.updateOne(
       {
         _id: documentId,
         'participants.senderId': senderId,
       },
       {
-        'participants.$': 1,
-      }
-    );
-    if (isExistSender) {
-      // sender is already in participants
-      const updatedNewReceivers = await Document.findOneAndUpdate(
-        {
-          _id: documentId,
-          'participants.senderId': senderId,
-        },
-        {
-          $addToSet: {
-            'participants.$.forwardDate': forwardDate,
-            'participants.$.receivers': receivers.map((r) => ({
-              receiverId: r,
-              readDate: null,
+        $addToSet: {
+          participants: {
+            $each: validReceivers.map((r) => ({
+              sender: senderId,
+              receiver: r.receiverId,
+              sendDate: r.sendDate,
             })),
           },
         },
-        {
-          new: true,
-        }
-      ).exec();
-      return res.status(200).json(updatedNewReceivers);
-    } else {
-      const forwardedDocument = await Document.findOneAndUpdate(
-        {
-          _id: documentId,
-        },
-        {
-          $push: {
-            participants: [
-              {
-                senderId: senderId,
-                receivers: receivers.map((r) => ({
-                  receiverId: r,
-                  readDate: null,
-                })),
-              },
-            ],
-          },
-        },
-        {
-          new: true,
-        }
-      ).exec();
-      return res.status(200).json(forwardedDocument);
-    }
+      }
+    );
+
+    return res.status(200).json({
+      message:
+        invalidReceivers.length > 0
+          ? `Receivers "${invalidReceivers.map(
+              (r) => r.receiverId
+            )}" already exist in this document`
+          : 'success',
+      dataFailed: invalidReceivers,
+      dataSuccess: validReceivers,
+    });
   } catch (error) {
     next(error);
   }
