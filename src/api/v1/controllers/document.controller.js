@@ -25,7 +25,7 @@ const createDocument = async (req, res, next) => {
       title,
       content,
       summary,
-      relativeDocuments,
+      relatedDocuments,
       publisher,
       participants,
     } = req.body;
@@ -67,12 +67,12 @@ const createDocument = async (req, res, next) => {
       );
     }
 
-    if (relativeDocuments) {
+    if (relatedDocuments) {
       const countValidDocuments = await Document.countDocuments({
-        _id: { $in: relativeDocuments },
+        _id: { $in: relatedDocuments },
       }).exec();
 
-      if (countValidDocuments !== relativeDocuments?.length) {
+      if (countValidDocuments !== relatedDocuments?.length) {
         throw CreateError.BadRequest(
           `Some of the relative documents does not exist`
         );
@@ -84,10 +84,10 @@ const createDocument = async (req, res, next) => {
       throw CreateError.BadRequest(`Publisher "${publisher}" does not exist`);
     }
 
-    if (participantsParsed && participantsParsed.receivers.length > 0) {
+    if (participantsParsed && participantsParsed.length > 0) {
       const countValidReceivers = await User.countDocuments({
         _id: {
-          $in: participantsParsed?.receivers?.map((r) => r.receiverId),
+          $in: participantsParsed?.map((r) => r.receiver),
         },
       });
 
@@ -100,7 +100,7 @@ const createDocument = async (req, res, next) => {
     if (req.files) {
       files = await uploadFiles(req.files);
     }
-
+    participantsParsed.root = true;
     const newDocument = new Document({
       //properties
       title,
@@ -116,7 +116,7 @@ const createDocument = async (req, res, next) => {
       content,
       summary,
       fileList: files,
-      relativeDocuments,
+      relatedDocuments,
       participants: participantsParsed,
 
       publisher,
@@ -183,7 +183,7 @@ const getDocumentDetail = async (req, res, next) => {
       .populate('typesOfDocument', 'label value -_id')
       .populate('publisher', 'username _id')
       .select('-__v -createdAt -updatedAt')
-      .lean();
+      .lean({ autopopulate: true });
 
     if (!foundDocument) {
       throw CreateError.NotFound(`Document "${documentId}" does not exist`);
@@ -206,15 +206,13 @@ const getDocumentDetail = async (req, res, next) => {
       publisher,
     } = foundDocument;
 
-    // const participants = foundDocument.participants.map((p) => {
-    //   console.log('🚀 :: p.senderId._id', p.senderId._id);
-    //   if (p.senderId._id.toString() === publisher._id.toString()) {
-    //     return {
-    //       ...p,
-    //       root: true,
-    //     };
-    //   } else return p;
-    // });
+    const participantsTree = listToTree(
+      participants,
+      'receiver',
+      'sender',
+      'children',
+      '_id'
+    );
 
     const result = {
       property: {
@@ -230,9 +228,9 @@ const getDocumentDetail = async (req, res, next) => {
         summary,
         publisher,
       },
-      files: foundDocument.fileList,
-      participants: foundDocument.participants,
-      relatedDocuments: foundDocument.relativeDocuments,
+      files: fileList,
+      participants: participantsTree,
+      relatedDocuments: relatedDocuments,
     };
 
     return res.status(200).json({
@@ -300,7 +298,7 @@ const updateReadDate = async (req, res, next) => {
 const forwardDocument = async (req, res, next) => {
   try {
     const { documentId, senderId } = req.params;
-    const { receivers, forwardDate } = req.body;
+    const { receivers } = req.body;
 
     const foundDocument = await Document.findOne({ _id: documentId });
     if (!foundDocument) {
@@ -345,7 +343,7 @@ const forwardDocument = async (req, res, next) => {
     await Document.updateOne(
       {
         _id: documentId,
-        'participants.senderId': senderId,
+        'participants.$.sender': senderId,
       },
       {
         $addToSet: {
