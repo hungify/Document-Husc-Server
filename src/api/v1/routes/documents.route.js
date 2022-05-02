@@ -23,8 +23,10 @@ router
   .route('/:documentId/receiver/:receiverId')
   .put(documentValidation.updateReadDate, documentController.updateReadDate);
 
-router
-  .route('/:documentId/forward/:senderId')
-  .put(documentValidation.forwardDocument, documentController.forwardDocument);
+
+router.route('/:documentId/forward/:senderId').put(
+  // paramValidation.objectId,
+  documentController.forwardDocument
+);
 
 module.exports = router;
