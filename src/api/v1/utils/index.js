@@ -40,6 +40,7 @@ module.exports = {
     const map = module.exports.toMap(arr, childKey, nestedKey);
     return arr.reduce((acc, current) => {
       const key = current[parentKey][nestedKey].toString();
+      delete current[parentKey];
 
       if (map[key]) {
         map[key][wrapKey] = map[key][wrapKey] || [];
