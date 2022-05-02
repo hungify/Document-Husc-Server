@@ -60,7 +60,7 @@ const documentSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    relatedDocuments: [
+    relativeDocuments: [
       {
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'Documents',
@@ -75,26 +75,33 @@ const documentSchema = new mongoose.Schema(
     participants: [
       {
         _id: false,
-        sender: {
+        root: {
+          type: Boolean,
+          default: true,
+        },
+        senderId: {
           ref: 'Users',
           type: mongoose.Schema.Types.ObjectId,
           required: true,
-          autopopulate: { select: 'username avatar ' },
         },
         sendDate: {
           type: Date,
           default: null,
         },
-        readDate: {
-          type: Date,
-          default: null,
-        },
-        receiver: {
-          ref: 'Users',
-          type: mongoose.Schema.Types.ObjectId,
-          required: true,
-          autopopulate: { select: 'username avatar ' },
-        },
+        receivers: [
+          {
+            _id: false,
+            readDate: {
+              type: Date,
+              default: null,
+            },
+            receiverId: {
+              ref: 'Users',
+              type: mongoose.Schema.Types.ObjectId,
+              required: true,
+            },
+          },
+        ],
       },
     ],
     fileList: [
