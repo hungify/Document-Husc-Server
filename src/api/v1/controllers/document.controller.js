@@ -8,6 +8,7 @@ const { UrgentLevel } = require('../models/ugentLevel.model');
 const APICore = require('../libs/apiCore');
 const { uploadFiles } = require('../utils/s3');
 const { isJSON, removeEmptyObjInArrByKeys, listToTree } = require('../utils');
+const _ = require('lodash');
 
 const createDocument = async (req, res, next) => {
   try {
@@ -180,7 +181,7 @@ const getDocumentDetail = async (req, res, next) => {
       .populate('category', 'title value -_id')
       .populate('urgentLevel', 'label value colorTag -_id')
       .populate('typesOfDocument', 'label value -_id')
-      .populate('publisher', 'username -_id')
+      .populate('publisher', 'username _id')
       .select('-__v -createdAt -updatedAt')
       .lean({ autopopulate: true });
 
@@ -202,6 +203,7 @@ const getDocumentDetail = async (req, res, next) => {
       participants,
       relatedDocuments,
       fileList,
+      publisher,
     } = foundDocument;
 
     const participantsTree = listToTree(
@@ -224,6 +226,7 @@ const getDocumentDetail = async (req, res, next) => {
         title,
         content,
         summary,
+        publisher,
       },
       files: fileList,
       participants: participantsTree,
@@ -316,7 +319,28 @@ const forwardDocument = async (req, res, next) => {
       );
     }
 
-    const forwardedDocument = await Document.findOneAndUpdate(
+    const existReceivers = await Document.find({
+      _id: documentId,
+      'participants.$.receiver': { $in: receivers.map((r) => r.receiverId) },
+    }).lean({ autopopulate: true });
+
+    let validReceivers = { ...receivers };
+    let invalidReceivers = [];
+
+    if (existReceivers.length > 0) {
+      validReceivers = _.filter(receivers, (r) => {
+        return !_.find(existReceivers[0].participants, (p) => {
+          return p.receiver._id.toString() === r.receiverId;
+        });
+      });
+      invalidReceivers = _.filter(receivers, (r) => {
+        return _.find(existReceivers[0].participants, (p) => {
+          return p.receiver._id.toString() === r.receiverId;
+        });
+      });
+    }
+
+    await Document.updateOne(
       {
         _id: documentId,
         'participants.$.sender': senderId,
@@ -324,7 +348,7 @@ const forwardDocument = async (req, res, next) => {
       {
         $addToSet: {
           participants: {
-            $each: receivers.map((r) => ({
+            $each: validReceivers.map((r) => ({
               sender: senderId,
               receiver: r.receiverId,
               sendDate: r.sendDate,
@@ -333,9 +357,16 @@ const forwardDocument = async (req, res, next) => {
         },
       }
     );
+
     return res.status(200).json({
-      message: 'success',
-      data: forwardedDocument,
+      message:
+        invalidReceivers.length > 0
+          ? `Receivers "${invalidReceivers.map(
+              (r) => r.receiverId
+            )}" already exist in this document`
+          : 'success',
+      dataFailed: invalidReceivers,
+      dataSuccess: validReceivers,
     });
   } catch (error) {
     next(error);
