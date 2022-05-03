@@ -19,7 +19,7 @@ const createDocument = async (req, res, next) => {
       title: Joi.string().required(),
       relatedDocuments: Joi.alternatives()
         .try(Joi.array().items(Joi.objectId()), Joi.string().allow(''))
-        .required(),
+        .required(), // Form data transfer array to empty string
       //properties
       validityStatus: Joi.string().valid('valid', 'invalid').default('valid'),
 
@@ -28,16 +28,22 @@ const createDocument = async (req, res, next) => {
 
       documentFrom: Joi.string().valid('input', 'attach').required(),
 
-      participants: Joi.object({
-        senderId: Joi.objectId().required(),
-        sendDate: Joi.date().required(),
-        receivers: Joi.array()
-          .items({
-            receiverId: Joi.objectId().required(),
+      participants: Joi.alternatives()
+        .try(
+          Joi.array().items(
+            Joi.object().keys({
+              sender: Joi.objectId().required(),
+              sendDate: Joi.date().required(),
+              readDate: Joi.date().default(null),
+              receiver: Joi.objectId(),
+            })
+          ),
+          Joi.object().keys({
+            sender: Joi.objectId().required(),
+            sendDate: Joi.date().required(),
           })
-          .default([])
-          .required(),
-      }).required(),
+        )
+        .required(),
     })
     .when('.documentFrom', {
       is: 'input',
@@ -56,6 +62,7 @@ const createDocument = async (req, res, next) => {
     let body = {
       ...req.body,
     };
+
     if (isJSON(req.body.participants)) {
       body.participants = JSON.parse(req.body.participants);
     }
