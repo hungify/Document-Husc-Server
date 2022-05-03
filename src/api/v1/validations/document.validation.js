@@ -68,7 +68,7 @@ const createDocument = async (req, res, next) => {
 
 const updateReadDate = async (req, res, next) => {
   const documentSchema = Joi.object().keys({
-    readDate: Joi.date().required(),
+    readDate: Joi.date(),
   });
   try {
     await documentSchema.validateAsync(req.body);
