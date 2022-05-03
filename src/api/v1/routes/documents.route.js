@@ -18,17 +18,16 @@ router
 router
   .route('/:documentId')
   .get(paramValidation.objectId, documentController.getDocumentDetail)
-  .put(
+  .patch(
     documentValidation.updateRelatedDocuments,
     documentController.updateRelatedDocuments
   );
 
 router
-  .route('/:documentId/receiver/:receiverId')
-  .put(documentValidation.updateReadDate, documentController.updateReadDate);
+  .route('/:documentId/receiver/:receiverId/read')
+  .patch(documentValidation.updateReadDate, documentController.updateReadDate);
 
-
-router.route('/:documentId/forward/:senderId').put(
+router.route('/:documentId/sender/:senderId/forward').patch(
   // paramValidation.objectId,
   documentController.forwardDocument
 );
