@@ -59,6 +59,10 @@ userSchema.methods.isMatchPassword = async function (password) {
   }
 };
 
+userSchema.statics.findById = async function (id) {
+  return await this.findOne({ _id: id });
+};
+
 const User = connectToMongoLocal.model('Users', userSchema);
 
 module.exports = User;

@@ -221,6 +221,7 @@ const getDocumentDetail = async (req, res, next) => {
       publisher,
     } = foundDocument;
     let result = [];
+
     if (tab === 'participants') {
       const tree = listToTree(
         participants,
