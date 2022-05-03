@@ -23,4 +23,6 @@ router.use('/departments', require('./departments.route'));
 
 router.use('/documents', require('./documents.route'));
 
+router.use('/inbox', require('./inbox.route'));
+
 module.exports = router;

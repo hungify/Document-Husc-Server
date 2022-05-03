@@ -219,6 +219,8 @@ const getDocumentDetail = async (req, res, next) => {
       relatedDocuments,
       fileList,
       publisher,
+      isPublic,
+      isArchived,
     } = foundDocument;
     let result = [];
 
@@ -258,6 +260,8 @@ const getDocumentDetail = async (req, res, next) => {
         content,
         summary,
         publisher,
+        isPublic,
+        isArchived,
       };
     } else if (tab === 'files') {
       result = fileList;
@@ -307,7 +311,7 @@ const updateReadDate = async (req, res, next) => {
   try {
     const { documentId, receiverId } = req.params;
 
-    const { readDate } = req.body;
+    const readDate = req.body.readDate || new Date();
 
     const foundDocument = await Document.findOne({ _id: documentId });
     if (!foundDocument) {
@@ -338,7 +342,10 @@ const updateReadDate = async (req, res, next) => {
       }
     ).lean();
 
-    return res.status(200).json(updateReadDocument);
+    return res.status(200).json({
+      message: 'success',
+      data: updateReadDocument,
+    });
   } catch (error) {
     next(error);
   }

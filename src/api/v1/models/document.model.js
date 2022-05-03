@@ -79,13 +79,9 @@ const documentSchema = new mongoose.Schema(
           ref: 'Users',
           type: mongoose.Schema.Types.ObjectId,
           required: true,
-          autopopulate: { select: 'username avatar ' },
+          autopopulate: { select: 'username avatar email' },
         },
         sendDate: {
-          type: Date,
-          default: null,
-        },
-        readDate: {
           type: Date,
           default: null,
         },
@@ -93,7 +89,11 @@ const documentSchema = new mongoose.Schema(
           ref: 'Users',
           type: mongoose.Schema.Types.ObjectId,
           required: true,
-          autopopulate: { select: 'username avatar ' },
+          autopopulate: { select: 'username avatar email' },
+        },
+        readDate: {
+          type: Date,
+          default: null,
         },
       },
     ],
