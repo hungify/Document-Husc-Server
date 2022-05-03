@@ -32,10 +32,16 @@ const createDocument = async (req, res, next) => {
 
     let participantsParsed = null;
     if (participants) {
-      if (isJSON(participants)) {
-        participantsParsed = JSON.parse(participants);
+      const participantsTemp = isJSON(participants)
+        ? JSON.parse(participants)
+        : participants;
+
+      if (Array.isArray(participantsTemp)) {
+        participantsParsed = _.filter(participantsTemp, (p) => {
+          return p.receiver !== publisher;
+        });
       } else {
-        participantsParsed = participants;
+        participantsParsed = participantsTemp;
       }
     }
 
@@ -70,7 +76,7 @@ const createDocument = async (req, res, next) => {
     if (relatedDocuments) {
       const countValidDocuments = await Document.countDocuments({
         _id: { $in: relatedDocuments },
-      }).exec();
+      }).lean();
 
       if (countValidDocuments !== relatedDocuments?.length) {
         throw CreateError.BadRequest(
@@ -84,7 +90,7 @@ const createDocument = async (req, res, next) => {
       throw CreateError.BadRequest(`Publisher "${publisher}" does not exist`);
     }
 
-    if (participantsParsed && participantsParsed.length > 0) {
+    if (participantsParsed.length > 0) {
       const countValidReceivers = await User.countDocuments({
         _id: {
           $in: participantsParsed?.map((r) => r.receiver),
@@ -100,7 +106,7 @@ const createDocument = async (req, res, next) => {
     if (req.files) {
       files = await uploadFiles(req.files);
     }
-    participantsParsed.root = true;
+
     const newDocument = new Document({
       //properties
       title,
@@ -111,12 +117,13 @@ const createDocument = async (req, res, next) => {
       urgentLevel: foundUrgentLevel._id,
       agency: foundAgency._id,
       category: foundCategory._id,
+      isPublic: Array.isArray(participantsParsed) ? false : true,
 
       title,
       content,
       summary,
       fileList: files,
-      relatedDocuments,
+      relatedDocuments: relatedDocuments || [],
       participants: participantsParsed,
 
       publisher,
@@ -374,27 +381,39 @@ const forwardDocument = async (req, res, next) => {
         `Receivers "${receivers.map((r) => r.receiverId)}" does not exist`
       );
     }
+    const validSender = await Document.find({
+      _id: documentId,
+      participants: {
+        $elemMatch: {
+          receiver: senderId,
+        },
+      },
+    });
+    if (!validSender) {
+      throw CreateError.BadRequest(
+        `Sender "${senderId}" must be is already a receiver of document "${documentId}" from another sender in order to forward it`
+      );
+    }
 
     const existReceivers = await Document.find({
       _id: documentId,
       'participants.$.receiver': { $in: receivers.map((r) => r.receiverId) },
     }).lean({ autopopulate: true });
 
-    let validReceivers = { ...receivers };
-    let invalidReceivers = [];
-
-    if (existReceivers.length > 0) {
-      validReceivers = _.filter(receivers, (r) => {
-        return !_.find(existReceivers[0].participants, (p) => {
-          return p.receiver._id.toString() === r.receiverId;
-        });
+    const validReceivers = [];
+    const invalidReceivers = [];
+    _.forEach(receivers, (r) => {
+      !_.forEach(existReceivers[0].participants, (p) => {
+        if (
+          p?.receiver?._id?.toString() === r.receiverId ||
+          p?.sender?._id?.toString() === r.receiverId
+        ) {
+          invalidReceivers.push(r);
+        } else {
+          validReceivers.push(r);
+        }
       });
-      invalidReceivers = _.filter(receivers, (r) => {
-        return _.find(existReceivers[0].participants, (p) => {
-          return p.receiver._id.toString() === r.receiverId;
-        });
-      });
-    }
+    });
 
     await Document.updateOne(
       {
@@ -407,7 +426,7 @@ const forwardDocument = async (req, res, next) => {
             $each: validReceivers.map((r) => ({
               sender: senderId,
               receiver: r.receiverId,
-              sendDate: r.sendDate,
+              sendDate: r.sendDate || new Date(),
             })),
           },
         },
