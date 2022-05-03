@@ -88,12 +88,10 @@ const documentSchema = new mongoose.Schema(
         receiver: {
           ref: 'Users',
           type: mongoose.Schema.Types.ObjectId,
-          required: true,
           autopopulate: { select: 'username avatar email' },
         },
         readDate: {
           type: Date,
-          default: null,
         },
       },
     ],
