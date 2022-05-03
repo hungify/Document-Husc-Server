@@ -17,7 +17,11 @@ router
 
 router
   .route('/:documentId')
-  .get(paramValidation.objectId, documentController.getDocumentDetail);
+  .get(paramValidation.objectId, documentController.getDocumentDetail)
+  .put(
+    documentValidation.updateRelatedDocuments,
+    documentController.updateRelatedDocuments
+  );
 
 router
   .route('/:documentId/receiver/:receiverId')

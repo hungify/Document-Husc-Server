@@ -183,6 +183,21 @@ const getDocumentDetail = async (req, res, next) => {
       .populate('urgentLevel', 'label value colorTag -_id')
       .populate('typesOfDocument', 'label value -_id')
       .populate('publisher', 'username _id')
+      .populate({
+        path: 'relatedDocuments',
+        select:
+          'documentNumber signer title issueDate fileList urgentLevel publisher',
+        populate: [
+          {
+            path: 'publisher',
+            select: 'username _id',
+          },
+          {
+            path: 'urgentLevel',
+            select: 'label value colorTag -_id',
+          },
+        ],
+      })
       .select('-__v -createdAt -updatedAt')
       .lean({ autopopulate: true });
 
@@ -227,6 +242,7 @@ const getDocumentDetail = async (req, res, next) => {
       ];
       result = participantsTree;
     } else if (tab === 'relatedDocuments') {
+      delete relatedDocuments[0].participants;
       result = relatedDocuments;
     } else if (tab === 'property') {
       result = {
@@ -405,10 +421,47 @@ const forwardDocument = async (req, res, next) => {
   }
 };
 
+const updateRelatedDocuments = async (req, res, next) => {
+  try {
+    const { documentId } = req.params;
+    const ids = req.query.ids.split(',');
+
+    const foundDocument = await Document.findOne({ _id: documentId });
+    if (!foundDocument) {
+      throw CreateError.NotFound(`Document "${documentId}" does not exist`);
+    }
+
+    const countValidRelatedDocuments = await Document.countDocuments({
+      _id: { $in: ids },
+    });
+    if (countValidRelatedDocuments !== ids.length) {
+      throw CreateError.BadRequest(`Related documents "${ids}" does not exist`);
+    }
+
+    const updateRelatedDocuments = await Document.findOneAndUpdate(
+      {
+        _id: documentId,
+      },
+      { $addToSet: { relatedDocuments: { $each: ids } } },
+      {
+        new: true,
+      }
+    ).lean();
+
+    return res.status(200).json({
+      message: 'success',
+      data: updateRelatedDocuments,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createDocument,
   getListDocuments,
   getDocumentDetail,
   updateReadDate,
   forwardDocument,
+  updateRelatedDocuments,
 };

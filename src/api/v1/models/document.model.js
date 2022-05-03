@@ -62,7 +62,7 @@ const documentSchema = new mongoose.Schema(
     },
     relativeDocuments: [
       {
-        type: [mongoose.Schema.Types.ObjectId],
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Documents',
         default: [],
       },
