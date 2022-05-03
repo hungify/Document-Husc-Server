@@ -5,7 +5,8 @@ const _ = require('lodash');
 
 const getInboxDocuments = async (req, res, next) => {
   try {
-    const { page, limit, orderBy, userId } = req.query;
+    const { page, limit, orderBy } = req.query;
+    const { userId } = req.params;
 
     const pageNumber = parseInt(page, 10) || 1;
     const pageSizeNumber = parseInt(limit, 10) || 10;
@@ -14,7 +15,7 @@ const getInboxDocuments = async (req, res, next) => {
 
     const foundUser = await User.findById(userId);
     if (!foundUser) {
-      throw new CreateError(404, 'User not found');
+      next(CreateError.NotFound('User not found'));
     }
 
     let result = [];
@@ -61,6 +62,7 @@ const getInboxDocuments = async (req, res, next) => {
         title: item.title,
         summary: item.summary,
         content: item.content,
+        isPublic: item.isPublic,
         urgentLevel: item.urgentLevel,
         readDate: _.find(item.participants, (i) => {
           return i.receiver._id.toString() === userId;
