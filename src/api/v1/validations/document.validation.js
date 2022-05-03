@@ -121,10 +121,30 @@ const getDocumentByFilter = async (req, res, next) => {
   }
 };
 
+const updateRelatedDocuments = async (req, res, next) => {
+  try {
+    const querySchema = Joi.array().items(Joi.objectId());
+    const paramSchema = Joi.object().keys({
+      documentId: Joi.objectId().required(),
+    });
+    const ids = req.query.ids.split(',');
+
+    await Promise.all([
+      querySchema.validateAsync(ids),
+      paramSchema.validateAsync(req.params),
+    ]);
+
+    next();
+  } catch (error) {
+    next(CreateError.BadRequest(error.message));
+  }
+};
+
 module.exports = {
   createDocument,
   updateReadDate,
   getListDocuments,
   forwardDocument,
   getDocumentByFilter,
+  updateRelatedDocuments,
 };
