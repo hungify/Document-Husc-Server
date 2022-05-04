@@ -6,7 +6,7 @@ const _ = require('lodash');
 const getInboxDocuments = async (req, res, next) => {
   try {
     const { page, limit, orderBy } = req.query;
-    const { userId } = req.params;
+    const { userId } = req.payload; // get from jwt middleware
 
     const pageNumber = parseInt(page, 10) || 1;
     const pageSizeNumber = parseInt(limit, 10) || 10;

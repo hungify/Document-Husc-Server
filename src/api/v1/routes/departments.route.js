@@ -7,20 +7,12 @@ const ROLES = require('../../../configs/roles.config');
 
 const router = express.Router();
 
-// router
-//   .route('/')
-//   .get(departmentController.getDepartments)
-//   .post(
-//     departmentValidation.createDepartment,
-//     departmentController.createDepartment
-//   );
-
 router
   .route('/')
   .get(departmentController.getDepartments)
   .post(
-    verifyAccessToken,
-    verifyRoles(ROLES.admin),
+    // verifyAccessToken,
+    // verifyRoles(ROLES.admin),
     departmentValidation.createDepartment,
     departmentController.createDepartment
   );
