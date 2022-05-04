@@ -45,11 +45,7 @@ const router = express.Router();
 
 router
   .route('/')
-  .get(
-    verifyAccessToken,
-    verifyRoles(ROLES.user, ROLES.admin),
-    documentController.getListDocuments
-  )
+  .get(documentController.getListDocuments)
   .post(
     verifyAccessToken,
     verifyRoles(ROLES.admin),

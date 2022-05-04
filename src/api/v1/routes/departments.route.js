@@ -17,11 +17,7 @@ const router = express.Router();
 
 router
   .route('/')
-  .get(
-    verifyAccessToken,
-    verifyRoles(ROLES.user, ROLES.admin),
-    departmentController.getDepartments
-  )
+  .get(departmentController.getDepartments)
   .post(
     verifyAccessToken,
     verifyRoles(ROLES.admin),

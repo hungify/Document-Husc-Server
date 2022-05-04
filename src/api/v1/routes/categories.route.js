@@ -23,11 +23,7 @@ const router = express.Router();
 
 router
   .route('/')
-  .get(
-    verifyAccessToken,
-    verifyRoles(ROLES.user, ROLES.admin),
-    categoryController.getAllCategories
-  )
+  .get(categoryController.getAllCategories)
   .post(
     verifyAccessToken,
     verifyRoles(ROLES.admin),
