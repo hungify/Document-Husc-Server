@@ -14,24 +14,18 @@ module.exports = {
     databaseName: process.env.MONGO_DB_NAME || 'test',
     authSource: process.env.MONGO_DB_AUTH_SOURCE || 'admin',
   },
+  redis: {
+    host: process.env.REDIS_HOST || '127.0.0.1',
+    port: process.env.REDIS_PORT || 6379,
+    password: process.env.REDIS_PASSWORD || '',
+    expireIn: process.env.REDIS_EXPIRE_IN || 60 * 60 * 24,
+    connectTimeout: process.env.REDIS_CONNECT_TIMEOUT || 10000,
+  },
   jwt: {
-    secret: process.env.JWT_SECRET || 'secret',
-  },
-  mail: {
-    host: process.env.MAIL_HOST || 'smtp.gmail.com',
-    port: process.env.MAIL_PORT || 465,
-    secure: process.env.MAIL_SECURE || true,
-    auth: {
-      user: process.env.MAIL_USER || '',
-      pass: process.env.MAIL_PASS || '',
-    },
-    from: process.env.MAIL_FROM || '',
-  },
-  googleAPI: {
-    clientID: process.env.GOOGLE_CLIENT_ID || '',
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-    redirectURL: process.env.GOOGLE_REDIRECT_URI || '',
-    refreshToken: process.env.GOOGLE_REFRESH_TOKEN || '',
+    accessTokenSecret: process.env.ACCESS_TOKEN_SECRET || '',
+    accessTokenExpiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN || '1h',
+    refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET || '',
+    refreshTokenExpiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN || '7d',
   },
   s3: {
     accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
