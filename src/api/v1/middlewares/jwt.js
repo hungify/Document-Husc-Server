@@ -3,9 +3,9 @@ const JWT = require('jsonwebtoken');
 const redisLocal = require('../../../configs/redis.config');
 const { jwt } = require('../../../configs/env.config');
 
-const signInAccessToken = (userId) => {
+const signInAccessToken = ({ userId, role }) => {
   return new Promise((resolve, reject) => {
-    const payload = { userId };
+    const payload = { userId, role };
     const secret = jwt.accessTokenSecret;
     const expiresIn = jwt.accessTokenExpiresIn;
     const options = {
@@ -40,9 +40,9 @@ const verifyAccessToken = (req, res, next) => {
   });
 };
 
-const signInRefreshToken = (userId) => {
+const signInRefreshToken = ({ userId, role }) => {
   return new Promise((resolve, reject) => {
-    const payload = { userId };
+    const payload = { userId, role };
     const secret = jwt.refreshTokenSecret;
     const expiresIn = jwt.refreshTokenExpiresIn;
     const options = {
@@ -74,6 +74,7 @@ const verifyRefreshToken = async (refreshToken) => {
           return reject(createError.InternalServerError(err.message));
         }
         if (reply === refreshToken) {
+          console.log('🚀 :: payload', payload);
           return resolve(payload);
         }
         return reject(createError.Unauthorized());
