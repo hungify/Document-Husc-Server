@@ -28,11 +28,7 @@ const router = express.Router();
 
 router
   .route('/')
-  .get(
-    verifyAccessToken,
-    verifyRoles(ROLES.user, ROLES.admin),
-    typesOfDocumentController.getAllTypesOfDocuments
-  )
+  .get(typesOfDocumentController.getAllTypesOfDocuments)
   .post(
     verifyAccessToken,
     verifyRoles(ROLES.admin),
