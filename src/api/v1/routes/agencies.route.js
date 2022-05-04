@@ -21,11 +21,7 @@ const router = express.Router();
 
 router
   .route('/')
-  .get(
-    verifyAccessToken,
-    verifyRoles(ROLES.user, ROLES.admin),
-    agencyController.getAllAgencies
-  )
+  .get(agencyController.getAllAgencies)
   .post(
     verifyAccessToken,
     verifyRoles(ROLES.admin),
