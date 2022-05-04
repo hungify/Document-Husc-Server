@@ -34,7 +34,9 @@ const createDepartment = async (req, res, next) => {
 
 const getDepartments = async (req, res, next) => {
   try {
-    const departments = await Department.find();
+    const departments = await Department.find()
+      .select('-__v -createdAt -updatedAt')
+      .lean();
 
     return res.status(200).json({
       message: 'success',

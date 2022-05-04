@@ -6,18 +6,33 @@ function filterByReferenceFields(queryObject) {
   const excludedFields = ['title', 'documentNumber', 'orderBy', 'start', 'end'];
   excludedFields.forEach((el) => delete queryShouldBe[el]);
 
-  const keys = Object.keys(queryShouldBe);
-  const values = Object.values(queryShouldBe);
+  const fieldsNeedPop = Object.keys(queryShouldBe);
+  const valuesInFieldsNeedPop = Object.values(queryShouldBe);
 
-  const populates = keys.map((key) => {
+  const populatesNeedFields = fieldsNeedPop.map((f) => {
     return {
-      path: key,
+      path: f,
       select: 'value title label colorTag -_id',
-      match: { value: values[keys.indexOf(key)] },
+      match: {
+        value: { $in: valuesInFieldsNeedPop[fieldsNeedPop.indexOf(f)] },
+      },
     };
   });
 
-  return populates;
+  const allFields = ['category', 'agency', 'urgentLevel', 'typesOfDocument'];
+
+  const fieldsMissPop = _.difference(allFields, fieldsNeedPop);
+
+  const populates = fieldsMissPop.map((key) => {
+    return {
+      path: key,
+      select: 'value title label colorTag -_id',
+    };
+  });
+
+  const populatesAll = populates.concat(populatesNeedFields);
+
+  return populatesAll;
 }
 
 function filterByDateRange(queryObject) {
@@ -92,7 +107,9 @@ function APICore(queryString, model) {
 
     if (_.intersection(queryKeys, filterReferenceKeys).length > 0) {
       const populates = filterByReferenceFields(queryObject);
-      this.query = this.query.populate(populates.map((p) => p));
+
+      this.query = this.query.populate(populates);
+
       return this;
     } else if (_.intersection(queryKeys, filterRangeKeys).length > 0) {
       const query = filterByDateRange(queryObject);
@@ -105,7 +122,6 @@ function APICore(queryString, model) {
       this.query = this.query.find({ _id: { $in: ids } });
       return this;
     } else if (!_.isEmpty(queryObject)) {
-      const queryShouldBe = { ...queryObject };
       queryObject.title.$options = 'i';
       let queryStr = JSON.stringify(queryObject);
       queryStr = queryStr.replace(
@@ -116,7 +132,6 @@ function APICore(queryString, model) {
       return this;
     } else {
       const keys = ['category', 'agency', 'urgentLevel', 'typesOfDocument'];
-
       const populates = keys.map((key) => {
         return {
           path: key,
