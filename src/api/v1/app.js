@@ -1,6 +1,5 @@
 const createError = require('http-errors');
 const express = require('express');
-const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const helmet = require('helmet');
 const cors = require('cors');
@@ -19,7 +18,6 @@ const bootServer = () => {
   app.use(logger('dev'));
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
-  app.use(cookieParser());
 
   app.use(cors(require('../../configs/cors.config')));
   app.use('/api/v1', require('./routes'));
