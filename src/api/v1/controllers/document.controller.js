@@ -150,11 +150,10 @@ const getListDocuments = async (req, res, next) => {
 
     const result = await Promise.allSettled([
       api.query
-        .populate('publisher', 'username -_id')
         .select(
           'agency category urgentLevel typesOfDocument documentNumber title signer issueDate fileList'
         )
-        .lean(),
+        .lean({ autopopulate: true }),
       Document.countDocuments({}),
     ]);
 

@@ -83,7 +83,9 @@ const deleteAgency = async (req, res, next) => {
 
 const getAllAgencies = async (req, res, next) => {
   try {
-    const foundAgencies = await Agency.find({}).lean();
+    const foundAgencies = await Agency.find({})
+      .select('-__v -createdAt -updatedAt')
+      .lean();
     return res.status(200).json({
       message: 'success',
       data: foundAgencies,
