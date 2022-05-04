@@ -57,6 +57,7 @@ const login = async (req, res, next) => {
       data: {
         accessToken,
         refreshToken,
+        role: foundUser.role,
       },
     });
   } catch (error) {
