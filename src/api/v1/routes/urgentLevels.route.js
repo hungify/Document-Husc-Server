@@ -10,11 +10,7 @@ const router = express.Router();
 
 router
   .route('/')
-  .get(
-    verifyAccessToken,
-    verifyRoles(ROLES.user, ROLES.admin),
-    urgentLevelController.getAllUrgentLevels
-  )
+  .get(urgentLevelController.getAllUrgentLevels)
   .post(
     verifyAccessToken,
     verifyRoles(ROLES.admin),
