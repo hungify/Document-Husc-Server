@@ -25,8 +25,8 @@ router
   .route('/')
   .get(categoryController.getAllCategories)
   .post(
-    verifyAccessToken,
-    verifyRoles(ROLES.admin),
+    // verifyAccessToken,
+    // verifyRoles(ROLES.admin),
     categoryValidate.createCategory,
     categoryController.createCategory
   );
@@ -34,9 +34,9 @@ router
 router
   .route('/:categoryId')
   .put(
-    verifyAccessToken,
-    verifyRoles(ROLES.admin),
-    paramValidation.objectId('categoryId'),
+    // verifyAccessToken,
+    // verifyRoles(ROLES.admin),
+    // paramValidation.objectId('categoryId'),
     categoryValidate.updateCategory,
     categoryController.updateCategory
   );

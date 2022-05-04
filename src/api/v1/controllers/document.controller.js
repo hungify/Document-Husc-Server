@@ -73,12 +73,17 @@ const createDocument = async (req, res, next) => {
       );
     }
 
-    if (relatedDocuments) {
+    const relatedDocumentsList =
+      relatedDocuments && _.isString(relatedDocuments)
+        ? relatedDocuments.split(',')
+        : [];
+
+    if (relatedDocumentsList.length > 0) {
       const countValidDocuments = await Document.countDocuments({
-        _id: { $in: relatedDocuments },
+        _id: { $in: relatedDocumentsList },
       }).lean();
 
-      if (countValidDocuments !== relatedDocuments?.length) {
+      if (countValidDocuments !== relatedDocumentsList?.length) {
         throw CreateError.BadRequest(
           `Some of the relative documents does not exist`
         );
