@@ -43,8 +43,14 @@ const login = async (req, res, next) => {
       throw CreateError.Unauthorized('Invalid credentials');
     }
 
-    const accessToken = await signInAccessToken(foundUser._id);
-    const refreshToken = await signInRefreshToken(foundUser._id);
+    const accessToken = await signInAccessToken({
+      userId: foundUser._id,
+      role: foundUser.role,
+    });
+    const refreshToken = await signInRefreshToken({
+      userId: foundUser._id,
+      role: foundUser.role,
+    });
 
     return res.status(200).json({
       message: 'success',
@@ -65,10 +71,10 @@ const refreshToken = async (req, res, next) => {
     if (refreshToken.startsWith('Bearer '))
       refreshToken = refreshToken.slice(7);
 
-    const { userId } = await verifyRefreshToken(refreshToken);
+    const { userId, role } = await verifyRefreshToken(refreshToken);
 
-    const newAccessToken = await signInAccessToken(userId);
-    const newRefreshToken = await signInRefreshToken(userId);
+    const newAccessToken = await signInAccessToken({ userId, role });
+    const newRefreshToken = await signInRefreshToken({ userId, role });
 
     return res.status(200).json({
       message: 'success',
