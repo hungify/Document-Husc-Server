@@ -19,7 +19,7 @@ const createDocument = async (req, res, next) => {
       title: Joi.string().required(),
       relatedDocuments: Joi.alternatives()
         .try(Joi.array().items(Joi.objectId()), Joi.string().allow(''))
-        .required(), // Form data transfer array to empty string
+        .required(), // Form data alway transfer array to empty string
       //properties
       validityStatus: Joi.string().valid('valid', 'invalid').default('valid'),
 

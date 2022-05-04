@@ -6,12 +6,10 @@ const ROLES = require('../../../configs/roles.config');
 
 const router = express.Router();
 
-// router
-//   .route('/')
-//   .get(userController.getAllUsers);
-
-router
-  .route('/')
-  .get(verifyAccessToken, verifyRoles(ROLES.admin), userController.getAllUsers);
+router.route('/').get(
+  // verifyAccessToken,
+  // verifyRoles(ROLES.admin),
+  userController.getAllUsers
+);
 
 module.exports = router;

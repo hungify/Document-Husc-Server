@@ -27,4 +27,6 @@ router.use('/inbox', require('./inbox.route'));
 
 router.use('/sent', require('./sent.route'));
 
+router.use('/dashboard', require('./dashboard.route'));
+
 module.exports = router;

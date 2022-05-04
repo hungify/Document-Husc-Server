@@ -12,8 +12,8 @@ router
   .route('/')
   .get(urgentLevelController.getAllUrgentLevels)
   .post(
-    verifyAccessToken,
-    verifyRoles(ROLES.admin),
+    // verifyAccessToken,
+    // verifyRoles(ROLES.admin),
     urgentLevelValidation.createUrgentLevel,
     urgentLevelController.createUrgentLevel
   );
@@ -21,8 +21,8 @@ router
 router
   .route('/:urgentLevelId')
   .put(
-    verifyAccessToken,
-    verifyRoles(ROLES.admin),
+    // verifyAccessToken,
+    // verifyRoles(ROLES.admin),
     paramValidation.objectId('urgentLevelId'),
     urgentLevelValidation.updateUrgentLevel,
     urgentLevelController.updateUrgentLevel
