@@ -6,7 +6,7 @@ const _ = require('lodash');
 const getSentDocuments = async (req, res, next) => {
   try {
     const { page, limit } = req.query;
-    const { userId } = req.params;
+    const { userId } = req.payload; // get from jwt middleware
 
     const pageNumber = parseInt(page, 10) || 1;
     const pageSizeNumber = parseInt(limit, 10) || 10;
@@ -32,14 +32,6 @@ const getSentDocuments = async (req, res, next) => {
       .limit(pageSizeNumber)
       .skip(skip)
       .lean({ autopopulate: true });
-
-    const toList = _.map(inboxDocuments.participants, (item) => {
-      if (item.sender === userId) {
-        return {
-          ...item,
-        };
-      }
-    });
 
     const data = _.map(inboxDocuments, (item) => {
       return {
