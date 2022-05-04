@@ -1,17 +1,16 @@
 const express = require('express');
-const inboxController = require('../controllers/inbox.controller');
+const ROLES = require('../../../configs/roles.config');
+const dashboardController = require('.././controllers/dashboard.controller');
 const { verifyAccessToken } = require('../middlewares/jwt');
 const verifyRoles = require('../middlewares/roles');
-const ROLES = require('../../../configs/roles.config');
-
 const router = express.Router();
 
 router
-  .route('/')
+  .route('/analytics')
   .get(
     verifyAccessToken,
     verifyRoles(ROLES.user, ROLES.admin),
-    inboxController.getInboxDocuments
+    dashboardController.getAnalytics
   );
 
 module.exports = router;
