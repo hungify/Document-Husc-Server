@@ -70,6 +70,7 @@ const documentSchema = new mongoose.Schema(
     publisher: {
       ref: 'Users',
       type: mongoose.Schema.Types.ObjectId,
+      autopopulate: { select: 'username avatar email -_id' },
       required: true,
     },
     participants: [

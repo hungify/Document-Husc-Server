@@ -34,13 +34,13 @@ const login = async (req, res, next) => {
     const foundUser = await User.findOne({ email });
 
     if (!foundUser) {
-      throw CreateError.NotFound(`User with email "${email}" not found`);
+      throw CreateError.NotFound(`Email or password is incorrect`);
     }
 
     const isMatch = await foundUser.isMatchPassword(password);
 
     if (!isMatch) {
-      throw CreateError.Unauthorized('Invalid credentials');
+      throw CreateError.Unauthorized('Email or password is incorrect');
     }
 
     const accessToken = await signInAccessToken({
