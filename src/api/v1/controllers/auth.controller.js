@@ -58,6 +58,7 @@ const login = async (req, res, next) => {
         accessToken,
         refreshToken,
         role: foundUser.role,
+        userId: foundUser._id,
       },
     });
   } catch (error) {
@@ -82,6 +83,7 @@ const refreshToken = async (req, res, next) => {
       data: {
         accessToken: newAccessToken,
         refreshToken: newRefreshToken,
+        userId: foundUser._id,
       },
     });
   } catch (error) {
