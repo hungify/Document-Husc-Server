@@ -36,7 +36,7 @@ const updateTypesOfDocuments = async (req, res, next) => {
     const foundTypesOfDocument = await TypeOfDocument.findById(
       typesOfDocumentId
     ).lean();
-    
+
     if (!foundTypesOfDocument) {
       throw CreateError.NotFound(
         `TypeOfDocument with typesOfDocumentId "${typesOfDocumentId}" not found`
@@ -79,7 +79,9 @@ const updateTypesOfDocuments = async (req, res, next) => {
 
 const getAllTypesOfDocuments = async (req, res, next) => {
   try {
-    const foundTypesOfDocuments = await TypeOfDocument.find({}).lean();
+    const foundTypesOfDocuments = await TypeOfDocument.find({})
+      .select('-__v -createdAt -updatedAt')
+      .lean();
     return res.status(200).json({
       message: 'success',
       data: foundTypesOfDocuments,
