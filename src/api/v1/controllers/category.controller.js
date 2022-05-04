@@ -91,7 +91,9 @@ const updateCategory = async (req, res, next) => {
 
 const getAllCategories = async (req, res, next) => {
   try {
-    const foundCategories = await Category.find({}).lean();
+    const foundCategories = await Category.find({})
+      .select('-__v -createdAt -updatedAt')
+      .lean();
     return res.status(200).json({
       message: 'success',
       data: foundCategories,

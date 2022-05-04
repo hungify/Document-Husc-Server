@@ -33,7 +33,9 @@ const updateUrgentLevel = async (req, res, next) => {
     const { label, colorTag } = req.body;
     const { urgentLevelId } = req.params;
 
-    const foundUrgentLevel = await UrgentLevel.findById(urgentLevelId).lean();
+    const foundUrgentLevel = await UrgentLevel.findById(urgentLevelId)
+      .select('-__v -createdAt -updatedAt')
+      .lean();
     if (!foundUrgentLevel) {
       throw CreateError.NotFound(
         `UrgentLevel with id "${urgentLevelId}" not found`
