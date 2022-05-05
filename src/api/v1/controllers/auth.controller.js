@@ -15,8 +15,15 @@ const register = async (req, res, next) => {
     if (foundUser) {
       throw CreateError.Conflict(`User with email "${email}" already exists`);
     }
-
-    const user = new User({ username, department, email, password, role });
+    const avatar = username.chartAt(0).toUpperCase();
+    const user = new User({
+      username,
+      department,
+      email,
+      avatar,
+      password,
+      role,
+    });
     const savedUser = await user.save();
 
     return res.status(201).json({
