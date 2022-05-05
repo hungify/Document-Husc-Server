@@ -9,22 +9,17 @@ const ROLES = require('../../../configs/roles.config');
 
 const router = express.Router();
 
-router
-  .route('/')
-  .get(documentController.getListDocuments)
-  .post(
-    // verifyAccessToken,
-    // verifyRoles(ROLES.admin),
-    upload.array('files', 5),
-    documentValidation.createDocument,
-    documentController.createDocument
-  );
+router.route('/').get(documentController.getListDocuments).post(
+  // verifyAccessToken,
+  // verifyRoles(ROLES.admin),
+  upload.array('files', 5),
+  documentValidation.createDocument,
+  documentController.createDocument
+);
 
 router
   .route('/:documentId')
   .get(
-    // verifyAccessToken,
-    // verifyRoles(ROLES.user, ROLES.admin),
     paramValidation.objectId('documentId'),
     documentController.getDocumentDetail
   )
@@ -33,25 +28,6 @@ router
     // verifyRoles(ROLES.admin),
     documentValidation.updateRelatedDocuments,
     documentController.updateRelatedDocuments
-  );
-
-router
-  .route('/:documentId/receiver/:receiverId/read')
-  .patch(
-    // verifyAccessToken,
-    // verifyRoles(ROLES.user, ROLES.admin),
-    paramValidation.objectId('documentId', 'receiverId'),
-    documentValidation.updateReadDate,
-    documentController.updateReadDate
-  );
-
-router
-  .route('/:documentId/sender/:senderId/forward')
-  .patch(
-    // verifyAccessToken,
-    // paramValidation.objectId('documentId', 'senderId'),
-    verifyRoles(ROLES.user, ROLES.admin),
-    documentController.forwardDocument
   );
 
 module.exports = router;

@@ -1,9 +1,16 @@
 const CreateError = require('http-errors');
 const User = require('../models/user.model');
 
-const getAllUsers = async (req, res, next) => {
+const getAllUsersNotMe = async (req, res, next) => {
   try {
-    const users = await User.find({})
+    const userId = req?.payload?.userId; // get from jwt middleware
+    if (!userId) {
+      throw CreateError.BadRequest('User not found');
+    }
+
+    const users = await User.find({
+      _id: { $ne: userId },
+    })
       .select('-password -__v -createdAt -updatedAt')
       .populate('department', 'label')
       .lean();
@@ -19,7 +26,7 @@ const getAllUsers = async (req, res, next) => {
 
 const getProfile = async (req, res, next) => {
   try {
-    const userId = req?.payload?.userId ; // get from jwt middleware
+    const userId = req?.payload?.userId; // get from jwt middleware
     if (!userId) {
       throw CreateError.BadRequest('User not found');
     }
@@ -41,6 +48,6 @@ const getProfile = async (req, res, next) => {
 };
 
 module.exports = {
-  getAllUsers,
+  getAllUsersNotMe,
   getProfile,
 };

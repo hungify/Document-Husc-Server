@@ -1,8 +1,10 @@
 const express = require('express');
-const userController = require('../controllers/user.controller');
+const sendController = require('../controllers/send.controller');
 const { verifyAccessToken } = require('../middlewares/jwt');
 const verifyRoles = require('../middlewares/roles');
 const ROLES = require('../../../configs/roles.config');
+const sendValidation = require('../validations/send.validation');
+const paramValidation = require('../validations/param.validation');
 
 const router = express.Router();
 
@@ -11,15 +13,17 @@ router
   .get(
     verifyAccessToken,
     verifyRoles(ROLES.user, ROLES.admin),
-    userController.getAllUsersNotMe
+    sendController.getSendDocuments
   );
 
 router
-  .route('/profile')
-  .get(
+  .route('/:documentId/forward')
+  .patch(
     verifyAccessToken,
     verifyRoles(ROLES.user, ROLES.admin),
-    userController.getProfile
+    paramValidation.objectId('documentId'),
+    sendValidation.forwardDocument,
+    sendController.forwardDocument
   );
 
 module.exports = router;
