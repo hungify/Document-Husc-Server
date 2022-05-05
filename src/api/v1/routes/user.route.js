@@ -6,11 +6,13 @@ const ROLES = require('../../../configs/roles.config');
 
 const router = express.Router();
 
-router.route('/').get(
-  // verifyAccessToken,
-  // verifyRoles(ROLES.admin),
-  userController.getAllUsers
-);
+router
+  .route('/')
+  .get(
+    verifyAccessToken,
+    verifyRoles(ROLES.user, ROLES.admin),
+    userController.getAllUsersNotMe
+  );
 
 router
   .route('/profile')

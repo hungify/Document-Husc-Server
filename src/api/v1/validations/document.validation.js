@@ -73,18 +73,6 @@ const createDocument = async (req, res, next) => {
   }
 };
 
-const updateReadDate = async (req, res, next) => {
-  const documentSchema = Joi.object().keys({
-    readDate: Joi.date(),
-  });
-  try {
-    await documentSchema.validateAsync(req.body);
-    next();
-  } catch (error) {
-    next(CreateError.BadRequest(error.message));
-  }
-};
-
 const getListDocuments = async (req, res, next) => {
   const documentSchema = Joi.object().keys({
     page: Joi.number().integer().min(1).default(1),
@@ -94,20 +82,6 @@ const getListDocuments = async (req, res, next) => {
   try {
     await documentSchema.validateAsync(req.query);
     next();
-  } catch (error) {
-    next(CreateError.BadRequest(error.message));
-  }
-};
-
-const forwardDocument = async (req, res, next) => {
-  const documentSchema = Joi.object().keys({
-    receiverId: Joi.array().items(Joi.objectId().required()),
-    parentId: Joi.objectId().required(),
-    readDate: Joi.date().default(null),
-    forwardedDate: Joi.date().required(),
-  });
-  try {
-    await documentSchema.validateAsync(req.body);
   } catch (error) {
     next(CreateError.BadRequest(error.message));
   }
@@ -149,9 +123,7 @@ const updateRelatedDocuments = async (req, res, next) => {
 
 module.exports = {
   createDocument,
-  updateReadDate,
   getListDocuments,
-  forwardDocument,
   getDocumentByFilter,
   updateRelatedDocuments,
 };
