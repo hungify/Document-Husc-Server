@@ -111,6 +111,57 @@ const getInboxDocuments = async (req, res, next) => {
   }
 };
 
+const updateReadDocument = async (req, res, next) => {
+  try {
+    const { documentId } = req.params;
+
+    const userId = req?.payload?.userId; // get from jwt middleware
+    if (!userId) {
+      throw CreateError.BadRequest('User not found');
+    }
+
+    const readDate = req.body.readDate;
+    console.log('🚀 :: readDate', readDate);
+
+    const foundDocument = await Document.findOne({ _id: documentId });
+    if (!foundDocument) {
+      throw CreateError.NotFound(`Document "${documentId}" does not exist`);
+    }
+
+    const foundReceiver = User.findOne({ _id: userId });
+    if (!foundReceiver) {
+      throw CreateError.NotFound(`Receiver "${userId}" does not exist`);
+    }
+
+    const updateReadDocument = await Document.updateOne(
+      {
+        _id: documentId,
+        participants: {
+          $elemMatch: {
+            receiver: userId,
+          },
+        },
+      },
+      {
+        $set: {
+          'participants.$.readDate': readDate,
+        },
+      },
+      {
+        new: true,
+      }
+    ).lean();
+
+    return res.status(200).json({
+      message: 'success',
+      data: updateReadDocument,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getInboxDocuments,
+  updateReadDocument,
 };
