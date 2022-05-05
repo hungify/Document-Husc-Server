@@ -8,7 +8,7 @@ const getAllUsers = async (req, res, next) => {
       .populate('department', 'label')
       .lean();
 
-    res.status(200).json({
+    return res.status(200).json({
       message: 'success',
       data: users,
     });
@@ -17,6 +17,30 @@ const getAllUsers = async (req, res, next) => {
   }
 };
 
+const getProfile = async (req, res, next) => {
+  try {
+    const userId = req?.payload?.userId ; // get from jwt middleware
+    if (!userId) {
+      throw CreateError.BadRequest('User not found');
+    }
+
+    const user = await User.findById(userId).select(
+      '-password -__v -createdAt -updatedAt -_id -role'
+    );
+    if (!user) {
+      throw CreateError.BadRequest('User not found');
+    }
+
+    return res.status(200).json({
+      message: 'success',
+      data: user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getAllUsers,
+  getProfile,
 };
