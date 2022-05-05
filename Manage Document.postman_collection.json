@@ -165,7 +165,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"label\": \"Nghị quyết\"\n}",
+							"raw": "{\n    \"label\": \"Quyết định\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -306,8 +306,542 @@
 			]
 		},
 		{
+			"name": "Department",
+			"item": [
+				{
+					"name": "[Department]: Create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"label\": \"Khoa toán\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/departments",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"departments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[Department]: Get Alll",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/departments",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"departments"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "[Auth]: Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"Nguyen Manh Hung 6\",\n    \"email\": \"18T1021237@husc.edu.vn\",\n    \"password\":\"123456\",\n    \"role\":\"user\",\n    \"department\": \"626bdab5db0a4ecf6f4cf64c\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[Auth]: Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"vtk.cntt@husc.edu.vn\",\n    \"password\": \"123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[Auth]: Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjcyMGUxM2U5YjBkZTU5ZDU1NDdmYzUiLCJyb2xlIjoidXNlciIsImlhdCI6MTY1MTY0Nzk5NCwiZXhwIjoxNjUxNjQ4NTk0fQ._mQu5wF9Gn9cYGgMoI8Qsrmn1mZSv5JQA-g98i65sIo",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjcyMGUxM2U5YjBkZTU5ZDU1NDdmYzUiLCJyb2xlIjoidXNlciIsImlhdCI6MTY1MTY0Nzk5NCwiZXhwIjoxNjUxNjUxNTk0fQ.FDMQwsLvXt9szFw3y_mER5yzJGhhsLAkjxgNH0LsAIc\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/refresh-token",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"refresh-token"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "[User]: Get All Not Me",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjZmNDczMTY2MzkxZDIxNTg0ZGJiNWEiLCJyb2xlIjoidXNlciIsImlhdCI6MTY1MTc1NjU0NCwiZXhwIjoxNjUxNzU3MTQ0fQ.mPHqtrbz6bQduWCgO_HoPRsY90m5eiFETua4cKtfKJk",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[User]: Get Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjcyNmUyMDRmMDdiYzZmYzM0YjE1OWQiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE2NTE3MzI3MDMsImV4cCI6MTY1MTczMzMwM30.umfE2GNSxHabuVf85PuQt7bpt_EPeS81LxRvZ7AG23I",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/users/profile",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Inbox",
+			"item": [
+				{
+					"name": "[Inbox]: List",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjZmNDczMTY2MzkxZDIxNTg0ZGJiNWEiLCJyb2xlIjoidXNlciIsImlhdCI6MTY1MTczODI2NiwiZXhwIjoxNjUxNzM4ODY2fQ.FlRW5ApBKnZAowXGgJlyVT1X8Mauo8Q-H2nvYQ86DAY",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/inbox?orderBy=unread",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"inbox"
+							],
+							"query": [
+								{
+									"key": "orderBy",
+									"value": "unread"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[Document]: Update Read",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjZmNDczMTY2MzkxZDIxNTg0ZGJiNWEiLCJyb2xlIjoidXNlciIsImlhdCI6MTY1MTc1OTYxMywiZXhwIjoxNjUxNzYwNjEzfQ.G_fsSU8Oh0fU1WKOniAd1gv-j25ERze2_CfvSKTZOLQ",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"readDate\": \"05/02/2022\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/documents/627109f8bf6a2252044402cb/read",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"documents",
+								"627109f8bf6a2252044402cb",
+								"read"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Documents",
 			"item": [
+				{
+					"name": "Details",
+					"item": [
+						{
+							"name": "[All Tab]: Get all",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/documents/6273c9e541fc4a906ac5801d",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"documents",
+										"6273c9e541fc4a906ac5801d"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "[Tab]: Property",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/documents/626f76a511d2493a656b8d65?tab=property",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"documents",
+										"626f76a511d2493a656b8d65"
+									],
+									"query": [
+										{
+											"key": "tab",
+											"value": "property"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "[Tab]: Related Documents",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/documents/6273bf527a8e072bdbc0e8be?tab=relatedDocuments",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"documents",
+										"6273bf527a8e072bdbc0e8be"
+									],
+									"query": [
+										{
+											"key": "tab",
+											"value": "relatedDocuments"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "[Tab]: Files",
+							"request": {
+								"method": "GET",
+								"header": []
+							},
+							"response": []
+						},
+						{
+							"name": "[Tab]: Participants",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjZmNDczMTY2MzkxZDIxNTg0ZGJiNWEiLCJyb2xlIjoidXNlciIsImlhdCI6MTY1MTc2OTIxMSwiZXhwIjoxNjUxNzcwMjExfQ.Cvp5i_qJtP01BTMIWBgPEHnh8fAnNp6oqh1Kg5rAkXk",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/documents/6273dbfd307118ed1a1fd906?tab=participants",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"documents",
+										"6273dbfd307118ed1a1fd906"
+									],
+									"query": [
+										{
+											"key": "tab",
+											"value": "participants"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "[Tab]: Analytics",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/documents/6273dbfd307118ed1a1fd906?tab=analytics",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"documents",
+										"6273dbfd307118ed1a1fd906"
+									],
+									"query": [
+										{
+											"key": "tab",
+											"value": "analytics"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Filters",
+					"item": [
+						{
+							"name": "[Document]: List With Filter",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/documents?agency=dai-hoc-hue",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"documents"
+									],
+									"query": [
+										{
+											"key": "agency",
+											"value": "dai-hoc-hue"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "[Document]: List Sort",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/documents?sort=createdAt",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"documents"
+									],
+									"query": [
+										{
+											"key": "sort",
+											"value": "createdAt"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "[Document]: Range Date",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/documents?title[regex]=T&orderBy=createdAt&start=2022/04/26&end=2022/04/27&typesOfDocument=quyet-dinh",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"documents"
+									],
+									"query": [
+										{
+											"key": "title[regex]",
+											"value": "T"
+										},
+										{
+											"key": "orderBy",
+											"value": "createdAt"
+										},
+										{
+											"key": "start",
+											"value": "2022/04/26"
+										},
+										{
+											"key": "end",
+											"value": "2022/04/27"
+										},
+										{
+											"key": "typesOfDocument",
+											"value": "quyet-dinh"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Search",
+					"item": [
+						{
+							"name": "[Document]: Search Related Documents",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/documents?ids=626ab4af771355d142a3ab85,626ab3da771355d142a3ab7d",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"documents"
+									],
+									"query": [
+										{
+											"key": "ids",
+											"value": "626ab4af771355d142a3ab85,626ab3da771355d142a3ab7d"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "[Document]: Search Text",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/documents?typesOfDocument=6",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"documents"
+									],
+									"query": [
+										{
+											"key": "typesOfDocument",
+											"value": "6"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
 				{
 					"name": "[Document]: Create",
 					"request": {
@@ -315,7 +849,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"documentNumber\": \"015/NQ-HĐĐH\",\n    \"title\": \"Test\",\n    \"signer\": \"Nguyễn Vũ Quốc Huy\",\n    \"issuedDate\": \"2020-05-01\",\n    \"typesOfDocument\": \"nghi-quyet\",\n    \"urgentLevel\": \"binh-thuong\",\n    \"agency\": \"dai-hoc-hue\",\n    \"category\": \"khoa-hoc-cong-nghe-2\",\n    \"relativeDocuments\": [],\n    \"publisherId\": \"6262d3736129d8ca00aa894d\",\n    \"publishDate\": \"10/10/2021\",\n    \"fileList\": [\n        {\n            \"fileName\": \"test.pdf\",\n            \"filePath\": \"https://google.com\"\n        }\n    ],\n    \"participants\": [\n        {\n            \"senderId\": \"6262d3736129d8ca00aa894d\",\n            \"sendDate\":\"10/10/2022\",\n            \"receivers\": [\n                {\n                    \"receiverId\": \"6262d3ddd3abc63b5ce998fe\"\n                }\n            ]\n        }\n    ]\n}",
+							"raw": "{\n    \"documentNumber\": \"015/NQ-HĐĐH\",\n    \"title\": \"Test\",\n    \"signer\": \"Nguyễn Vũ Quốc Huy\",\n    \"issueDate\": \"2020-05-01\",\n    \"typesOfDocument\": \"nghi-quyet\",\n    \"urgentLevel\": \"binh-thuong\",\n    \"agency\": \"dai-hoc-hue\",\n    \"category\": \"khoa-hoc-cong-nghe-2\",\n    \"relatedDocuments\": [],\n    \"publisher\": \"62726e204f07bc6fc34b159d\",\n    \"content\": \"This is my content\",\n    \"documentFrom\": \"input\",\n    \"participants\": [\n        {\n            \"sender\": \"62726e204f07bc6fc34b159d\",\n            \"sendDate\": \"10/10/2022\",\n            \"receiver\": \"626f473166391d21584dbb5a\"\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -335,77 +869,125 @@
 					"response": []
 				},
 				{
-					"name": "[Document]: Update Read",
+					"name": "[Document]: Create with files",
 					"request": {
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"readDate\": \"05/23/2022\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
+						"method": "POST",
+						"header": [
+							{
+								"warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
+								"key": "Content-Type",
+								"value": "multipart/form-data",
+								"type": "text"
 							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "documentNumber",
+									"value": "015/NQ-HĐĐH",
+									"contentType": "application/json",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "title",
+									"value": "Test title",
+									"contentType": "application/json",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "category",
+									"value": "khoa-hoc-cong-nghe",
+									"contentType": "application/json",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "agency",
+									"value": "dai-hoc-hue",
+									"contentType": "application/json",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "signer",
+									"value": "Nguyễn Vũ Quốc Huy",
+									"contentType": "application/json",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "issueDate",
+									"value": "2020-05-01",
+									"contentType": "application/json",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "typeOfDocument",
+									"value": "nghi-quyet",
+									"contentType": "application/json",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "urgentLevel",
+									"value": "binh-thuong",
+									"contentType": "application/json",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "relativeDocuments",
+									"value": "[]",
+									"contentType": "application/json",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "publisherId",
+									"value": "6262d3736129d8ca00aa894d",
+									"contentType": "application/json",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "publishDate",
+									"value": "10/10/2021",
+									"contentType": "application/json",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "participants",
+									"value": "[]",
+									"contentType": "application/json",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "files",
+									"contentType": "multipart/form-data",
+									"type": "file",
+									"src": "/home/purdie/Desktop/test.pdf"
+								},
+								{
+									"key": "",
+									"value": "{\n    \"documentNumber\": \"015/NQ-HĐĐH\",\n    \"title\": \"Test\",\n    \"signer\": \"Nguyễn Vũ Quốc Huy\",\n    \"issuedDate\": \"2020-05-01\",\n    \"typesOfDocument\": \"nghi-quyet\",\n    \"urgentLevel\": \"binh-thuong\",\n    \"agency\": \"dai-hoc-hue\",\n    \"category\": \"khoa-hoc-cong-nghe-2\",\n    \"relativeDocuments\": [],\n    \"publisherId\": \"6262d3736129d8ca00aa894d\",\n    \"publishDate\": \"10/10/2021\",\n    \"participants\": []\n}",
+									"contentType": "application/json",
+									"type": "text"
+								}
+							]
 						},
 						"url": {
-							"raw": "{{baseUrl}}/documents/626611b33a395ff15195b9d8/receivers/6262d3736129d8ca00aa894d/6262d3ddd3abc63b5ce998fe",
+							"raw": "{{baseUrl}}/documents",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"documents",
-								"626611b33a395ff15195b9d8",
-								"receivers",
-								"6262d3736129d8ca00aa894d",
-								"6262d3ddd3abc63b5ce998fe"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "[Document]: Forward",
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"receivers\": [\"626355a0f5f73ddffffa995c\", \"62657974fcc0394ffd027ddb\",\"6266069b21666f36034af630\"],\n    \"forwardDate\": \"10/10/2022\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/documents/62660badaccf5c4ee9cc2c61/forward/6262d3ddd3abc63b5ce998fe",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"documents",
-								"62660badaccf5c4ee9cc2c61",
-								"forward",
-								"6262d3ddd3abc63b5ce998fe"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "[Document]: Get Detail",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/documents/6263b867ba40ec648525e2eb",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"documents",
-								"6263b867ba40ec648525e2eb"
+								"documents"
 							]
 						}
 					},
@@ -439,81 +1021,12 @@
 					"response": []
 				},
 				{
-					"name": "[Document]: List With Filter",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/documents?title[regex]=T",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"documents"
-							],
-							"query": [
-								{
-									"key": "title[regex]",
-									"value": "T"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "[Document]: Search Text",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/documents?q=T",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"documents"
-							],
-							"query": [
-								{
-									"key": "q",
-									"value": "T"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "[Document]: List Sort",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/documents?sort=-createdAt",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"documents"
-							],
-							"query": [
-								{
-									"key": "sort",
-									"value": "-createdAt"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "[Document]: Combines",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/documents?sort=-createdAt&agency=dai-hoc-hue&q=05",
+							"raw": "{{baseUrl}}/documents?sort=createAt&page=1&limit=10&typesOfDocument=quyet-dinh&title[regex]=t",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -523,15 +1036,23 @@
 							"query": [
 								{
 									"key": "sort",
-									"value": "-createdAt"
+									"value": "createAt"
 								},
 								{
-									"key": "agency",
-									"value": "dai-hoc-hue"
+									"key": "page",
+									"value": "1"
 								},
 								{
-									"key": "q",
-									"value": "05"
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "typesOfDocument",
+									"value": "quyet-dinh"
+								},
+								{
+									"key": "title[regex]",
+									"value": "t"
 								}
 							]
 						}
@@ -539,30 +1060,23 @@
 					"response": []
 				},
 				{
-					"name": "[Document]: Range Date",
+					"name": "[Document]: Append Related Document",
 					"request": {
-						"method": "GET",
+						"method": "PUT",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/documents?orderBy=createdAt&start=2022/04/26&end=2022/04/27",
+							"raw": "{{baseUrl}}/documents/626f76a511d2493a656b8d65?ids=6270083f3a404efe3e006fab",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"documents"
+								"documents",
+								"626f76a511d2493a656b8d65"
 							],
 							"query": [
 								{
-									"key": "orderBy",
-									"value": "createdAt"
-								},
-								{
-									"key": "start",
-									"value": "2022/04/26"
-								},
-								{
-									"key": "end",
-									"value": "2022/04/27"
+									"key": "ids",
+									"value": "6270083f3a404efe3e006fab"
 								}
 							]
 						}
@@ -572,16 +1086,45 @@
 			]
 		},
 		{
-			"name": "Auth",
+			"name": "Send",
 			"item": [
 				{
-					"name": "[Auth]: Register",
+					"name": "[Send]: List",
 					"request": {
-						"method": "POST",
-						"header": [],
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjZmNDczMTY2MzkxZDIxNTg0ZGJiNWEiLCJyb2xlIjoidXNlciIsImlhdCI6MTY1MTczNjUxMywiZXhwIjoxNjUxNzM3MTEzfQ.UVY-rgvsLPDgwd4yva0RzXavdYGYegzYUmYUlw7zXgY",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/send",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"send"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[Document]: Forward",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjZmNDczMTY2MzkxZDIxNTg0ZGJiNWEiLCJyb2xlIjoidXNlciIsImlhdCI6MTY1MTc2NTQxMywiZXhwIjoxNjUxNzY2NDEzfQ.-1gr-MBsryqFvOPCenmEg-0nNq5_EWAk63j-jlPoqqw",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"18T1025511\",\n    \"email\": \"18T105511@husc.edu.vn\",\n    \"password\":\"123\",\n    \"role\":\"user\"\n}",
+							"raw": "{\n    \"receivers\": [\n        {\n            \"receiverId\": \"6273655f60d081b56d4d2c7f\",\n            \"sendDate\": \"10/10/2011\"\n        },\n        {\n            \"receiverId\": \"6273656460d081b56d4d2c82\",\n            \"sendDate\": \"10/10/2012\"\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -589,13 +1132,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/auth/register",
+							"raw": "{{baseUrl}}/send/6273dbfd307118ed1a1fd906/forward",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"auth",
-								"register"
+								"send",
+								"6273dbfd307118ed1a1fd906",
+								"forward"
 							]
 						}
 					},
@@ -604,20 +1148,27 @@
 			]
 		},
 		{
-			"name": "User",
+			"name": "Dashboard",
 			"item": [
 				{
-					"name": "[User]: Get All",
+					"name": "[Analytics]: List",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjcyNmUyMDRmMDdiYzZmYzM0YjE1OWQiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE2NTE2NzA1ODgsImV4cCI6MTY1MTY3MTE4OH0.KEG8DG9FOcwUghwxBWBsMfHr7broFX9YZNCbHKN-3Bs",
+								"type": "text"
+							}
+						],
 						"url": {
-							"raw": "{{baseUrl}}/users",
+							"raw": "{{baseUrl}}/dashboard/analytics",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"users"
+								"dashboard",
+								"analytics"
 							]
 						}
 					},
