@@ -18,41 +18,69 @@ const getInboxDocuments = async (req, res, next) => {
       next(CreateError.NotFound('User not found'));
     }
 
+    let totalInbox = [];
+
     let result = [];
     if (orderByString === 'all') {
-      result = await Document.find({
-        participants: {
-          $elemMatch: {
-            receiver: userId,
+      const [total, inbox] = await Promise.all([
+        Document.countDocuments({
+          participants: {
+            $elemMatch: {
+              receiver: userId,
+            },
           },
-        },
-      })
-        .populate('urgentLevel', 'label value colorTag -_id')
-        .select(
-          'title content summary urgentLevel participants publisher issueDate _id'
-        )
+        }),
+        Document.find({
+          participants: {
+            $elemMatch: {
+              receiver: userId,
+            },
+          },
+        })
+          .populate('urgentLevel', 'label value colorTag -_id')
+          .select(
+            'title content summary urgentLevel participants publisher issueDate _id'
+          )
 
-        .limit(pageSizeNumber)
-        .skip(skip)
-        .lean({ autopopulate: true });
+          .limit(pageSizeNumber)
+          .skip(skip)
+          .lean({ autopopulate: true }),
+      ]);
+
+      totalInbox = total;
+      result = inbox;
     } else {
       //['read', 'unread'].includes(orderByString)
-      result = await Document.find({
-        participants: {
-          $elemMatch: {
-            receiver: userId,
-            readDate: orderByString === 'unread' ? null : { $ne: null },
+      const [total, inbox] = await Promise.all([
+        await Document.find({
+          participants: {
+            $elemMatch: {
+              receiver: userId,
+              readDate: orderByString === 'unread' ? null : { $ne: null },
+            },
           },
-        },
-      })
-        .populate('urgentLevel', 'label value colorTag -_id')
-        .select(
-          'title content summary urgentLevel participants publisher issueDate _id'
-        )
+        })
+          .count()
+          .lean(),
+        Document.find({
+          participants: {
+            $elemMatch: {
+              receiver: userId,
+              readDate: orderByString === 'unread' ? null : { $ne: null },
+            },
+          },
+        })
+          .populate('urgentLevel', 'label value colorTag -_id')
+          .select(
+            'title content summary urgentLevel participants publisher issueDate _id'
+          )
 
-        .limit(pageSizeNumber)
-        .skip(skip)
-        .lean({ autopopulate: true });
+          .limit(pageSizeNumber)
+          .skip(skip)
+          .lean({ autopopulate: true }),
+      ]);
+      totalInbox = total;
+      result = inbox;
     }
 
     const data = _.map(result, (item) => {
@@ -75,7 +103,7 @@ const getInboxDocuments = async (req, res, next) => {
 
     return res.status(200).json({
       message: 'success',
-      totalMatch: data.length,
+      total: totalInbox,
       data: data,
     });
   } catch (error) {
