@@ -12,4 +12,12 @@ router.route('/').get(
   userController.getAllUsers
 );
 
+router
+  .route('/profile')
+  .get(
+    verifyAccessToken,
+    verifyRoles(ROLES.user, ROLES.admin),
+    userController.getProfile
+  );
+
 module.exports = router;

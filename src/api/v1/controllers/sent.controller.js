@@ -17,23 +17,32 @@ const getSentDocuments = async (req, res, next) => {
       next(CreateError.NotFound('User not found'));
     }
 
-    const inboxDocuments = await Document.find({
-      participants: {
-        $elemMatch: {
-          sender: userId,
+    const [total, sent] = await Promise.all([
+      Document.countDocuments({
+        participants: {
+          $elemMatch: {
+            sender: userId,
+          },
         },
-      },
-    })
-      .populate('urgentLevel', 'label value colorTag -_id')
-      .select(
-        'title content summary urgentLevel participants publisher issueDate isPublic _id'
-      )
+      }).lean(),
+      await Document.find({
+        participants: {
+          $elemMatch: {
+            sender: userId,
+          },
+        },
+      })
+        .populate('urgentLevel', 'label value colorTag -_id')
+        .select(
+          'title content summary urgentLevel participants publisher issueDate isPublic _id'
+        )
 
-      .limit(pageSizeNumber)
-      .skip(skip)
-      .lean({ autopopulate: true });
+        .limit(pageSizeNumber)
+        .skip(skip)
+        .lean({ autopopulate: true }),
+    ]);
 
-    const data = _.map(inboxDocuments, (item) => {
+    const data = _.map(sent, (item) => {
       return {
         _id: item._id,
         title: item.title,
@@ -51,7 +60,8 @@ const getSentDocuments = async (req, res, next) => {
 
     return res.status(200).json({
       message: 'Success',
-      data,
+      total: total,
+      data: data,
     });
   } catch (error) {
     next(error);
