@@ -21,7 +21,8 @@ const register = async (req, res, next) => {
 const login = async (req, res, next) => {
   const userSchema = Joi.object({
     email: Joi.string().email().required(),
-    password: Joi.string().min(6).max(30).required(),
+    // password: Joi.string().min(6).max(30).required(),
+    password: Joi.string().required(),
   });
   try {
     await userSchema.validateAsync(req.body);
