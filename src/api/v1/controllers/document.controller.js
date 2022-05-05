@@ -9,6 +9,7 @@ const APICore = require('../libs/apiCore');
 const { uploadFiles } = require('../utils/s3');
 const { isJSON, removeEmptyObjInArrByKeys, listToTree } = require('../utils');
 const _ = require('lodash');
+const { getPayload } = require('../middlewares/jwt');
 
 const createDocument = async (req, res, next) => {
   try {
@@ -137,7 +138,7 @@ const createDocument = async (req, res, next) => {
     const savedDocument = await newDocument.save();
 
     return res.status(201).json({
-      message: 'Văn bản đã được ban hành thành công',
+      message: 'success',
       data: savedDocument,
     });
   } catch (error) {
@@ -188,26 +189,17 @@ const getDocumentDetail = async (req, res, next) => {
   try {
     const { documentId } = req.params;
     const { tab } = req.query;
+    const userId = getPayload(req, res, next)?.userId;
+
     const foundDocument = await Document.findOne({ _id: documentId })
       .populate('agency', 'label value -_id')
       .populate('category', 'title value -_id')
       .populate('urgentLevel', 'label value colorTag -_id')
       .populate('typesOfDocument', 'label value -_id')
-      .populate('publisher', 'username _id')
       .populate({
         path: 'relatedDocuments',
         select:
-          'documentNumber signer title issueDate fileList urgentLevel publisher',
-        populate: [
-          {
-            path: 'publisher',
-            select: 'username _id',
-          },
-          {
-            path: 'urgentLevel',
-            select: 'label value colorTag -_id',
-          },
-        ],
+          'documentNumber signer title issueDate fileList urgentLevel publisher ',
       })
       .select('-__v -createdAt -updatedAt')
       .lean({ autopopulate: true });
@@ -234,6 +226,14 @@ const getDocumentDetail = async (req, res, next) => {
       isArchived,
     } = foundDocument;
     let result = [];
+    let myReadDate = null;
+
+    if (userId) {
+      const myUser = participants.find(
+        (p) => p.receiver._id.toString() === userId
+      );
+      myReadDate = myUser?.readDate;
+    }
 
     if (tab === 'participants') {
       const tree = listToTree(
@@ -256,7 +256,9 @@ const getDocumentDetail = async (req, res, next) => {
       ];
       result = participantsTree;
     } else if (tab === 'relatedDocuments') {
-      delete relatedDocuments[0].participants;
+      if (relatedDocuments.length > 0) {
+        delete relatedDocuments[0].participants;
+      }
       result = relatedDocuments;
     } else if (tab === 'property') {
       result = {
@@ -311,141 +313,8 @@ const getDocumentDetail = async (req, res, next) => {
 
     return res.status(200).json({
       message: 'success',
+      myReadDate,
       data: result,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-const updateReadDate = async (req, res, next) => {
-  try {
-    const { documentId, receiverId } = req.params;
-
-    const readDate = req.body.readDate || new Date();
-
-    const foundDocument = await Document.findOne({ _id: documentId });
-    if (!foundDocument) {
-      throw CreateError.NotFound(`Document "${documentId}" does not exist`);
-    }
-
-    const foundReceiver = User.findOne({ _id: receiverId });
-    if (!foundReceiver) {
-      throw CreateError.NotFound(`Receiver "${receiverId}" does not exist`);
-    }
-
-    const updateReadDocument = await Document.findOneAndUpdate(
-      {
-        _id: documentId,
-        participants: {
-          $elemMatch: {
-            receiver: receiverId,
-          },
-        },
-      },
-      {
-        $set: {
-          'participants.$.readDate': new Date(readDate).toLocaleDateString(),
-        },
-      },
-      {
-        new: true,
-      }
-    ).lean();
-
-    return res.status(200).json({
-      message: 'success',
-      data: updateReadDocument,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-const forwardDocument = async (req, res, next) => {
-  try {
-    const { documentId, senderId } = req.params;
-    const { receivers } = req.body;
-
-    const foundDocument = await Document.findOne({ _id: documentId });
-    if (!foundDocument) {
-      throw CreateError.NotFound(`Document "${documentId}" does not exist`);
-    }
-
-    const foundSender = User.findOne({ _id: senderId });
-    if (!foundSender) {
-      throw CreateError.NotFound(`Sender "${senderId}" does not exist`);
-    }
-
-    const countValidReceivers = await User.countDocuments({
-      _id: { $in: receivers.map((r) => r.receiverId) },
-    });
-    if (countValidReceivers !== receivers.length) {
-      throw CreateError.BadRequest(
-        `Receivers "${receivers.map((r) => r.receiverId)}" does not exist`
-      );
-    }
-    const validSender = await Document.find({
-      _id: documentId,
-      participants: {
-        $elemMatch: {
-          receiver: senderId,
-        },
-      },
-    });
-    if (!validSender) {
-      throw CreateError.BadRequest(
-        `Sender "${senderId}" must be is already a receiver of document "${documentId}" from another sender in order to forward it`
-      );
-    }
-
-    const existReceivers = await Document.find({
-      _id: documentId,
-      'participants.$.receiver': { $in: receivers.map((r) => r.receiverId) },
-    }).lean({ autopopulate: true });
-
-    const validReceivers = [];
-    const invalidReceivers = [];
-    _.forEach(receivers, (r) => {
-      !_.forEach(existReceivers[0].participants, (p) => {
-        if (
-          p?.receiver?._id?.toString() === r.receiverId ||
-          p?.sender?._id?.toString() === r.receiverId
-        ) {
-          invalidReceivers.push(r);
-        } else {
-          validReceivers.push(r);
-        }
-      });
-    });
-
-    await Document.updateOne(
-      {
-        _id: documentId,
-        'participants.$.sender': senderId,
-      },
-      {
-        $addToSet: {
-          participants: {
-            $each: validReceivers.map((r) => ({
-              sender: senderId,
-              receiver: r.receiverId,
-              sendDate: r.sendDate || new Date(),
-            })),
-          },
-        },
-      }
-    );
-
-    return res.status(200).json({
-      message:
-        invalidReceivers.length > 0
-          ? `Receivers "${invalidReceivers.map(
-              (r) => r.receiverId
-            )}" already exist in this document`
-          : 'success',
-      dataFailed: invalidReceivers,
-      dataSuccess: validReceivers,
     });
   } catch (error) {
     next(error);
@@ -492,7 +361,5 @@ module.exports = {
   createDocument,
   getListDocuments,
   getDocumentDetail,
-  updateReadDate,
-  forwardDocument,
   updateRelatedDocuments,
 };

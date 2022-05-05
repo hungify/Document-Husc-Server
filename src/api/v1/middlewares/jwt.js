@@ -20,9 +20,9 @@ const signInAccessToken = ({ userId, role }) => {
 };
 
 const verifyAccessToken = (req, res, next) => {
-  if (!req.headers['authorization']) return next(createError.Unauthorized());
-
   let token = req.headers['authorization'];
+
+  if (!token) return next(createError.Unauthorized());
   if (token.startsWith('Bearer ')) token = token.slice(7, token.length);
 
   const secret = jwt.accessTokenSecret;
@@ -74,7 +74,6 @@ const verifyRefreshToken = async (refreshToken) => {
           return reject(createError.InternalServerError(err.message));
         }
         if (reply === refreshToken) {
-          console.log('🚀 :: payload', payload);
           return resolve(payload);
         }
         return reject(createError.Unauthorized());
@@ -83,9 +82,32 @@ const verifyRefreshToken = async (refreshToken) => {
   });
 };
 
+const getPayload = (req, res, next) => {
+  let token = req.headers['authorization'];
+
+  if (!token) return null;
+  if (token.startsWith('Bearer ')) token = token.slice(7, token.length);
+
+  const secret = jwt.accessTokenSecret;
+
+  JWT.verify(token, secret, (err, payload) => {
+    if (err) {
+      if (err.name === 'TokenExpiredError') {
+        return next(createError.Unauthorized(err.message));
+      } else if (err.name === 'JsonWebTokenError') {
+        return next(createError.Unauthorized());
+      }
+    }
+    req.payload = payload;
+  });
+
+  return req.payload;
+};
+
 module.exports = {
   signInAccessToken,
   verifyAccessToken,
   signInRefreshToken,
   verifyRefreshToken,
+  getPayload,
 };

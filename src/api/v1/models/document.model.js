@@ -70,7 +70,7 @@ const documentSchema = new mongoose.Schema(
     publisher: {
       ref: 'Users',
       type: mongoose.Schema.Types.ObjectId,
-      autopopulate: { select: 'username avatar email -_id' },
+      autopopulate: { select: 'username avatar email _id' },
       required: true,
     },
     participants: [
@@ -80,7 +80,7 @@ const documentSchema = new mongoose.Schema(
           ref: 'Users',
           type: mongoose.Schema.Types.ObjectId,
           required: true,
-          autopopulate: { select: 'username avatar email' },
+          autopopulate: { select: 'username avatar email _id' },
         },
         sendDate: {
           type: Date,
@@ -89,7 +89,7 @@ const documentSchema = new mongoose.Schema(
         receiver: {
           ref: 'Users',
           type: mongoose.Schema.Types.ObjectId,
-          autopopulate: { select: 'username avatar email' },
+          autopopulate: { select: 'username avatar email _id' },
         },
         readDate: {
           type: Date,
