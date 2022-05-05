@@ -85,7 +85,7 @@ const createDocument = async (req, res, next) => {
 
       if (countValidDocuments !== relatedDocumentsList?.length) {
         throw CreateError.BadRequest(
-          `Some of the relative documents does not exist`
+          `Some of the related documents does not exist`
         );
       }
     }
@@ -128,7 +128,7 @@ const createDocument = async (req, res, next) => {
       content,
       summary,
       fileList: files,
-      relatedDocuments: relatedDocuments || [],
+      relatedDocuments: relatedDocumentsList,
       participants: participantsParsed,
 
       publisher,
