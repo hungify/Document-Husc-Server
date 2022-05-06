@@ -2,9 +2,15 @@
   "name": "server",
   "version": "0.0.1",
   "private": true,
+  "license": "MIT",
+  "author": {
+    "name": "Hung Purdie",
+    "email": "nmhung.official@gmail.com"
+  },
   "type": "commonjs",
   "scripts": {
-    "start": "nodemon server.js"
+    "dev": "NODE_ENV=development nodemon server.js  ",
+    "start": "NODE_ENV=production pm2 startOrRestart ecosystem.config.json --no-daemon"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.78.0",
