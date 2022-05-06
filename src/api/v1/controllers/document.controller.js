@@ -191,7 +191,12 @@ const getDocumentDetail = async (req, res, next) => {
     const { tab } = req.query;
     const userId = getPayload(req, res, next)?.userId;
 
-    const foundDocument = await Document.findOne({ _id: documentId })
+    const foundDocument = await Document.findOne({
+      _id: documentId,
+      isArchived: {
+        $eq: false,
+      },
+    })
       .populate('agency', 'label value -_id')
       .populate('category', 'title value -_id')
       .populate('urgentLevel', 'label value colorTag -_id')
@@ -230,31 +235,46 @@ const getDocumentDetail = async (req, res, next) => {
 
     if (userId) {
       const myUser = participants.find(
-        (p) => p.receiver._id.toString() === userId
+        (p) => p?.receiver?._id.toString() === userId
       );
       myReadDate = myUser?.readDate;
     }
 
     if (tab === 'participants') {
-      const tree = listToTree(
-        participants,
-        'receiver',
-        'sender',
-        'children',
-        '_id'
-      );
-      const participantsTree = [
-        {
-          root: true,
-          receiver: {
-            username: publisher.username,
-            _id: publisher._id,
-            issueDate,
+      if (isPublic) {
+        const participantsTree = [
+          {
+            root: true,
+            receiver: {
+              username: publisher.username,
+              _id: publisher._id,
+              issueDate,
+            },
+            children: [],
           },
-          children: tree,
-        },
-      ];
-      result = participantsTree;
+        ];
+        result = participantsTree;
+      } else {
+        const tree = listToTree(
+          participants,
+          'receiver',
+          'sender',
+          'children',
+          '_id'
+        );
+        const participantsTree = [
+          {
+            root: true,
+            receiver: {
+              username: publisher.username,
+              _id: publisher._id,
+              issueDate,
+            },
+            children: tree,
+          },
+        ];
+        result = participantsTree;
+      }
     } else if (tab === 'relatedDocuments') {
       if (relatedDocuments.length > 0) {
         delete relatedDocuments[0].participants;
@@ -279,34 +299,38 @@ const getDocumentDetail = async (req, res, next) => {
     } else if (tab === 'files') {
       result = fileList;
     } else if (tab === 'analytics') {
-      let read = [];
-      let unread = [];
+      if (isPublic) {
+        result = [];
+      } else {
+        let read = [];
+        let unread = [];
 
-      _.forEach(participants, (p) => {
-        if (p.readDate) {
-          read.push({
-            username: p.receiver.username,
-            _id: p.receiver._id,
-            readDate: p.readDate,
-          });
-        } else {
-          unread.push({
-            username: p.receiver.username,
-            _id: p.receiver._id,
-          });
-        }
-      });
+        _.forEach(participants, (p) => {
+          if (p.readDate) {
+            read.push({
+              username: p.receiver.username,
+              _id: p.receiver._id,
+              readDate: p.readDate,
+            });
+          } else {
+            unread.push({
+              username: p.receiver.username,
+              _id: p.receiver._id,
+            });
+          }
+        });
 
-      result = {
-        read: {
-          users: read,
-          count: read.length,
-        },
-        unread: {
-          users: unread,
-          count: unread.length,
-        },
-      };
+        result = {
+          read: {
+            users: read,
+            count: read.length,
+          },
+          unread: {
+            users: unread,
+            count: unread.length,
+          },
+        };
+      }
     } else {
       result = foundDocument;
     }
@@ -315,6 +339,8 @@ const getDocumentDetail = async (req, res, next) => {
       message: 'success',
       myReadDate,
       data: result,
+      publisherId: publisher._id,
+      isPublic,
     });
   } catch (error) {
     next(error);
@@ -326,7 +352,12 @@ const updateRelatedDocuments = async (req, res, next) => {
     const { documentId } = req.params;
     const ids = req.query.ids.split(',');
 
-    const foundDocument = await Document.findOne({ _id: documentId });
+    const foundDocument = await Document.findOne({
+      _id: documentId,
+      isArchived: {
+        $eq: false,
+      },
+    });
     if (!foundDocument) {
       throw CreateError.NotFound(`Document "${documentId}" does not exist`);
     }
