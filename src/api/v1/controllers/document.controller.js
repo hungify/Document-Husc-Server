@@ -299,7 +299,7 @@ const getDocumentDetail = async (req, res, next) => {
     } else if (tab === 'files') {
       result = fileList;
     } else if (tab === 'analytics') {
-      if (isPublic) {
+      if (isPublic || !userId) {
         result = [];
       } else {
         let read = [];

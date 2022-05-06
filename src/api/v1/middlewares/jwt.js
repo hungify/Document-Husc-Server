@@ -1,7 +1,7 @@
 const createError = require('http-errors');
 const JWT = require('jsonwebtoken');
 const redisLocal = require('../../../configs/redis.config');
-const { jwt } = require('../../../configs/env.config');
+const { jwt, redis } = require('../../../configs/env.config');
 
 const signInAccessToken = ({ userId, role }) => {
   return new Promise((resolve, reject) => {
@@ -9,7 +9,7 @@ const signInAccessToken = ({ userId, role }) => {
     const secret = jwt.accessTokenSecret;
     const expiresIn = jwt.accessTokenExpiresIn;
     const options = {
-      expiresIn: `${expiresIn}s`,
+      expiresIn: expiresIn,
     };
 
     JWT.sign(payload, secret, options, (err, token) => {
@@ -30,7 +30,7 @@ const verifyAccessToken = (req, res, next) => {
   JWT.verify(token, secret, (err, payload) => {
     if (err) {
       if (err.name === 'TokenExpiredError') {
-        return next(createError.Unauthorized(err.message));
+        return next(createError.Unauthorized('access token has expired'));
       } else if (err.name === 'JsonWebTokenError') {
         return next(createError.Unauthorized());
       }
@@ -46,40 +46,47 @@ const signInRefreshToken = ({ userId, role }) => {
     const secret = jwt.refreshTokenSecret;
     const expiresIn = jwt.refreshTokenExpiresIn;
     const options = {
-      expiresIn: `${expiresIn}s`,
+      expiresIn: expiresIn,
     };
 
     JWT.sign(payload, secret, options, async (err, token) => {
       if (err) return reject(err);
-      redisLocal.set(userId.toString(), token, (err, reply) => {
-        if (err) {
-          return reject(createError.InternalServerError(err.message));
-        }
-      });
+      try {
+        await redisLocal.set(userId.toString(), token);
+        const redisExpiresIn = redis.expireIn;
+        await redisLocal.expire(userId.toString(), redisExpiresIn);
 
-      redisLocal.expire(userId.toString(), process.env.REDIS_EXPIRE_IN);
-      return resolve(token);
+        return resolve(token);
+      } catch (err) {
+        return reject(createError.InternalServerError(err.message));
+      }
     });
   });
 };
 
-const verifyRefreshToken = async (refreshToken) => {
-  return new Promise((resolve, reject) => {
-    const secret = jwt.refreshTokenSecret;
-    JWT.verify(refreshToken, secret, async (err, payload) => {
-      if (err) return reject(err);
-
-      redisLocal.get(payload.userId, (err, reply) => {
+const verifyRefreshToken = (refreshToken) => {
+  try {
+    return new Promise((resolve, reject) => {
+      const secret = jwt.refreshTokenSecret;
+      JWT.verify(refreshToken, secret, async (err, payload) => {
         if (err) {
-          return reject(createError.InternalServerError(err.message));
+          if (err.name === 'TokenExpiredError') {
+            return reject(
+              createError.Unauthorized('refresh token has expired')
+            );
+          }
+          return reject(err);
         }
+        const reply = await redisLocal.get(payload.userId);
         if (reply === refreshToken) {
           return resolve(payload);
         }
-        return reject(createError.Unauthorized());
+        return reject(createError.Unauthorized('refresh token is invalid'));
       });
     });
-  });
+  } catch (err) {
+    return reject(createError.InternalServerError(err.message));
+  }
 };
 
 const getPayload = (req, res, next) => {
@@ -91,17 +98,18 @@ const getPayload = (req, res, next) => {
   const secret = jwt.accessTokenSecret;
 
   JWT.verify(token, secret, (err, payload) => {
-    if (err) {
-      if (err.name === 'TokenExpiredError') {
-        return next(createError.Unauthorized(err.message));
-      } else if (err.name === 'JsonWebTokenError') {
-        return next(createError.Unauthorized());
-      }
-    }
     req.payload = payload;
   });
-
   return req.payload;
+};
+
+const revokeRefreshToken = async (userId) => {
+  try {
+    if (!userId) return;
+    await redisLocal.del(userId);
+  } catch (error) {
+    return reject(createError.InternalServerError(error.message));
+  }
 };
 
 module.exports = {
@@ -110,4 +118,5 @@ module.exports = {
   signInRefreshToken,
   verifyRefreshToken,
   getPayload,
+  revokeRefreshToken,
 };
