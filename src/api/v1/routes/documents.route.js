@@ -9,13 +9,16 @@ const ROLES = require('../../../configs/roles.config');
 
 const router = express.Router();
 
-router.route('/').get(documentController.getListDocuments).post(
-  // verifyAccessToken,
-  // verifyRoles(ROLES.admin),
-  upload.array('files', 5),
-  documentValidation.createDocument,
-  documentController.createDocument
-);
+router
+  .route('/')
+  .get(documentController.getListDocuments)
+  .post(
+    verifyAccessToken,
+    verifyRoles(ROLES.admin),
+    upload.array('files', 5),
+    documentValidation.createDocument,
+    documentController.createDocument
+  );
 
 router
   .route('/:documentId')
@@ -24,8 +27,8 @@ router
     documentController.getDocumentDetail
   )
   .patch(
-    // verifyAccessToken,
-    // verifyRoles(ROLES.admin),
+    verifyAccessToken,
+    verifyRoles(ROLES.admin),
     documentValidation.updateRelatedDocuments,
     documentController.updateRelatedDocuments
   );

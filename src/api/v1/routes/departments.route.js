@@ -11,8 +11,8 @@ router
   .route('/')
   .get(departmentController.getDepartments)
   .post(
-    // verifyAccessToken,
-    // verifyRoles(ROLES.admin),
+    verifyAccessToken,
+    verifyRoles(ROLES.admin),
     departmentValidation.createDepartment,
     departmentController.createDepartment
   );

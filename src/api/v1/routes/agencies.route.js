@@ -11,8 +11,8 @@ router
   .route('/')
   .get(agencyController.getAllAgencies)
   .post(
-    // verifyAccessToken,
-    // verifyRoles(ROLES.admin),
+    verifyAccessToken,
+    verifyRoles(ROLES.admin),
     agencyValidate.createAgency,
     agencyController.createAgency
   );
@@ -20,8 +20,8 @@ router
 router
   .route('/:agencyId')
   .put(
-    // verifyAccessToken,
-    // verifyRoles(ROLES.admin),
+    verifyAccessToken,
+    verifyRoles(ROLES.admin),
     paramValidation.objectId('agencyId'),
     agencyValidate.updateAgency,
     agencyController.updateAgency
