@@ -4,8 +4,8 @@ const {
   signInAccessToken,
   signInRefreshToken,
   verifyRefreshToken,
+  revokeRefreshToken,
 } = require('../middlewares/jwt');
-const redisLocal = require('../../../configs/redis.config');
 
 const register = async (req, res, next) => {
   try {
@@ -90,7 +90,8 @@ const refreshToken = async (req, res, next) => {
       data: {
         accessToken: newAccessToken,
         refreshToken: newRefreshToken,
-        userId: foundUser._id,
+        userId: userId,
+        role: role,
       },
     });
   } catch (error) {
@@ -100,23 +101,20 @@ const refreshToken = async (req, res, next) => {
 
 const logout = async (req, res, next) => {
   try {
-    let { refreshToken } = req.body;
+    let { refreshToken } = req.params;
     if (!refreshToken) throw CreateError.BadRequest();
     if (refreshToken.startsWith('Bearer '))
       refreshToken = refreshToken.slice(7);
 
     if (!refreshToken) {
-      throw CreateError.BadRequest();
+      throw CreateError.BadRequest('Refresh token is required');
     }
 
-    const { userId } = await verifyRefreshToken(refreshToken);
+    const payload = await verifyRefreshToken(refreshToken);
+    await revokeRefreshToken(payload.userId);
 
-    redisLocal.del(userId.toString(), (err, reply) => {
-      if (err) throw CreateError.InternalServerError();
-
-      return res.status(200).json({
-        message: 'success',
-      });
+    return res.status(200).json({
+      message: 'success',
     });
   } catch (error) {
     next(error);

@@ -49,7 +49,7 @@ const logout = async (req, res, next) => {
     refreshToken: Joi.string().required(),
   });
   try {
-    await logoutSchema.validateAsync(req.body);
+    await logoutSchema.validateAsync(req.params);
     next();
   } catch (error) {
     next(CreateError(error.message));
