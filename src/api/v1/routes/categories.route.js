@@ -8,37 +8,22 @@ const paramValidation = require('../validations/param.validation');
 
 const router = express.Router();
 
-// router
-//   .route('/')
-//   .get(categoryController.getAllCategories)
-//   .post(categoryValidate.createCategory, categoryController.createCategory);
-
-// router
-//   .route('/:categoryId')
-//   .put(
-//     paramValidation.objectId('categoryId'),
-//     categoryValidate.updateCategory,
-//     categoryController.updateCategory
-//   );
-
 router
   .route('/')
   .get(categoryController.getAllCategories)
   .post(
-    // verifyAccessToken,
-    // verifyRoles(ROLES.admin),
+    verifyAccessToken,
+    verifyRoles(ROLES.admin),
     categoryValidate.createCategory,
     categoryController.createCategory
   );
 
-router
-  .route('/:categoryId')
-  .put(
-    // verifyAccessToken,
-    // verifyRoles(ROLES.admin),
-    // paramValidation.objectId('categoryId'),
-    categoryValidate.updateCategory,
-    categoryController.updateCategory
-  );
+router.route('/:categoryId').put(
+  verifyAccessToken,
+  verifyRoles(ROLES.admin),
+  paramValidation.objectId('categoryId'),
+  categoryValidate.updateCategory,
+  categoryController.updateCategory
+);
 
 module.exports = router;

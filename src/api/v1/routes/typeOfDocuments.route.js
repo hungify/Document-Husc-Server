@@ -12,8 +12,8 @@ router
   .route('/')
   .get(typesOfDocumentController.getAllTypesOfDocuments)
   .post(
-    // verifyAccessToken,
-    // verifyRoles(ROLES.admin),
+    verifyAccessToken,
+    verifyRoles(ROLES.admin),
     typesOfDocumentValidation.createTypesOfDocuments,
     typesOfDocumentController.createTypesOfDocuments
   );
@@ -21,8 +21,8 @@ router
 router
   .route('/:typesOfDocumentId')
   .put(
-    // verifyAccessToken,
-    // verifyRoles(ROLES.admin),
+    verifyAccessToken,
+    verifyRoles(ROLES.admin),
     paramValidation.objectId('typesOfDocumentId'),
     typesOfDocumentValidation.createTypesOfDocuments,
     typesOfDocumentController.updateTypesOfDocuments
