@@ -59,7 +59,11 @@ function filterByDateRange(queryObject) {
 function APICore(queryString, model) {
   this.Model = model; // Model to query
   this.queryString = queryString; // Query string from client
-  this.query = this.Model.find(); // Query object
+  this.query = this.Model.find({
+    isArchived: {
+      $ne: true,
+    },
+  }); // Query object
 
   this.paginating = () => {
     const page = parseInt(this.queryString.page, 10) || 1;
