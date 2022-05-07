@@ -8,19 +8,8 @@ const register = async (req, res, next) => {
     role: Joi.string().valid('admin', 'user'),
     password: Joi.string().min(6).max(30).required(),
     email: Joi.string().email().required(),
-  })
-    .when('.role', {
-      is: 'admin',
-      then: Joi.object().keys({
-        department: Joi.string(),
-      }),
-    })
-    .when('.role', {
-      is: 'user',
-      then: Joi.object().keys({
-        department: Joi.string().required(),
-      }),
-    });
+    department: Joi.string().required(),
+  });
   try {
     await userSchema.validateAsync(req.body);
     next();
