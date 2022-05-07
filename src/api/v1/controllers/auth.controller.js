@@ -6,6 +6,7 @@ const {
   verifyRefreshToken,
   revokeRefreshToken,
 } = require('../middlewares/jwt');
+const Department = require('../models/department.model');
 
 const register = async (req, res, next) => {
   try {
@@ -15,10 +16,12 @@ const register = async (req, res, next) => {
     if (foundUser) {
       throw CreateError.Conflict(`User with email "${email}" already exists`);
     }
-    const avatar = username.chartAt(0).toUpperCase();
+    const departmentId = await Department.findOne({ name: department });
+    const avatar = username.charAt(0).toUpperCase();
+
     const user = new User({
       username,
-      department,
+      department: departmentId,
       email,
       avatar,
       password,
