@@ -34,7 +34,7 @@ const register = async (req, res, next) => {
       data: savedUser,
     });
   } catch (error) {
-    next(CreateError(error.message));
+    next(error);
   }
 };
 const login = async (req, res, next) => {
