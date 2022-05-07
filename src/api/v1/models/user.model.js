@@ -13,10 +13,8 @@ const userSchema = new mongoose.Schema(
       default: '',
     },
     department: {
-      _id: false,
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Departments',
-      required: true,
     },
     email: {
       type: String,
