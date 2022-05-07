@@ -5,11 +5,22 @@ const CreateError = require('http-errors');
 const register = async (req, res, next) => {
   const userSchema = Joi.object({
     username: Joi.string().required(),
-    department: Joi.string().required(),
-    email: Joi.string().email().required(),
+    role: Joi.string().valid('admin', 'user'),
     password: Joi.string().min(6).max(30).required(),
-    role: Joi.string().valid('admin', 'user').default('user'),
-  });
+    email: Joi.string().email().required(),
+  })
+    .when('.role', {
+      is: 'admin',
+      then: Joi.object().keys({
+        department: Joi.string(),
+      }),
+    })
+    .when('.role', {
+      is: 'user',
+      then: Joi.object().keys({
+        department: Joi.string().required(),
+      }),
+    });
   try {
     await userSchema.validateAsync(req.body);
     next();
@@ -21,8 +32,7 @@ const register = async (req, res, next) => {
 const login = async (req, res, next) => {
   const userSchema = Joi.object({
     email: Joi.string().email().required(),
-    // password: Joi.string().min(6).max(30).required(),
-    password: Joi.string().required(),
+    password: Joi.string().min(6).max(30).required(),
   });
   try {
     await userSchema.validateAsync(req.body);
