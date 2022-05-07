@@ -15,6 +15,19 @@ const createDepartment = async (req, res, next) => {
   }
 };
 
+const updateDepartment = async (req, res, next) => {
+  const departmentSchema = Joi.object({
+    label: Joi.string().required(),
+  });
+  try {
+    await departmentSchema.validateAsync(req.body);
+    next();
+  } catch (error) {
+    next(CreateError.BadRequest(error.message));
+  }
+};
+
 module.exports = {
   createDepartment,
+  updateDepartment,
 };
