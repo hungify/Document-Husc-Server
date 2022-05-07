@@ -1,12 +1,13 @@
 const app = require('./src/api/v1/app');
-const http = require('http');
+const https = require('https');
 const { port } = require('./src/configs/env.config');
 const {
   normalizePort,
   onError,
   onListening,
 } = require('./src/configs/port.config');
-
+const fs = require('fs');
+const path = require('path');
 /**
  * Get port from environment and store in Express.
  */
@@ -17,7 +18,13 @@ app.set('port', PORT);
  * Create HTTP server.
  */
 
-const server = http.createServer(app);
+const server = https.createServer(
+  {
+    key: fs.readFileSync(path.join(__dirname, './src/configs/ssl/key.pem')),
+    cert: fs.readFileSync(path.join(__dirname, './src/configs/ssl/cert.pem')),
+  },
+  app
+);
 
 /**
  * Listen on provided port, on all network interfaces.
