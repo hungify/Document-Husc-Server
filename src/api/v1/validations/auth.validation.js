@@ -5,7 +5,7 @@ const CreateError = require('http-errors');
 const register = async (req, res, next) => {
   const userSchema = Joi.object({
     username: Joi.string().required(),
-    department: Joi.objectId().required(),
+    department: Joi.string().required(),
     email: Joi.string().email().required(),
     password: Joi.string().min(6).max(30).required(),
     role: Joi.string().valid('admin', 'user').default('user'),
