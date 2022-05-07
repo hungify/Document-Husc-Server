@@ -27,8 +27,8 @@ router
     agencyController.updateAgency
   )
   .delete(
-    // verifyAccessToken,
-    // verifyRoles(ROLES.admin),
+    verifyAccessToken,
+    verifyRoles(ROLES.admin),
     agencyController.deleteAgency
   );
 
