@@ -23,7 +23,6 @@ const createDocument = async (req, res, next) => {
       //properties
       validityStatus: Joi.string().valid('valid', 'invalid').default('valid'),
 
-      publisher: Joi.objectId().required(),
       issueDate: Joi.date().required(),
 
       documentFrom: Joi.string().valid('input', 'attach').required(),
@@ -55,6 +54,73 @@ const createDocument = async (req, res, next) => {
       is: 'attach',
       then: Joi.object().keys({
         summary: Joi.string().required(),
+      }),
+    });
+
+  try {
+    let body = {
+      ...req.body,
+    };
+
+    if (isJSON(req.body.participants)) {
+      body.participants = JSON.parse(req.body.participants);
+    }
+    await documentSchema.validateAsync(body);
+    next();
+  } catch (error) {
+    next(CreateError.BadRequest(error.message));
+  }
+};
+
+const updateDocument = async (req, res, next) => {
+  const documentSchema = Joi.object()
+    .keys({
+      //properties
+      typesOfDocument: Joi.string(),
+      urgentLevel: Joi.string(),
+      agency: Joi.string(),
+      category: Joi.string(),
+
+      documentNumber: Joi.string(),
+      signer: Joi.string(),
+
+      title: Joi.string(),
+      relatedDocuments: Joi.alternatives().try(
+        Joi.array().items(Joi.objectId()),
+        Joi.string().allow('')
+      ), // Form data alway transfer array to empty string
+      //properties
+      validityStatus: Joi.string().valid('valid', 'invalid').default('valid'),
+
+      issueDate: Joi.date(),
+
+      documentFrom: Joi.string().valid('input', 'attach'),
+
+      participants: Joi.alternatives().try(
+        Joi.array().items(
+          Joi.object().keys({
+            sender: Joi.objectId(),
+            sendDate: Joi.date(),
+            readDate: Joi.date().default(null),
+            receiver: Joi.objectId(),
+          })
+        ),
+        Joi.object().keys({
+          sender: Joi.objectId(),
+          sendDate: Joi.date(),
+        })
+      ),
+    })
+    .when('.documentFrom', {
+      is: 'input',
+      then: Joi.object().keys({
+        content: Joi.string(),
+      }),
+    })
+    .when('.documentFrom', {
+      is: 'attach',
+      then: Joi.object().keys({
+        summary: Joi.string(),
       }),
     });
 
@@ -123,6 +189,7 @@ const updateRelatedDocuments = async (req, res, next) => {
 
 module.exports = {
   createDocument,
+  updateDocument,
   getListDocuments,
   getDocumentByFilter,
   updateRelatedDocuments,
