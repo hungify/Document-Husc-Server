@@ -89,18 +89,20 @@ const verifyRefreshToken = (refreshToken) => {
   }
 };
 
-const getPayload = (req, res, next) => {
+const getPayload = (req) => {
   let token = req.headers['authorization'];
 
   if (!token) return null;
   if (token.startsWith('Bearer ')) token = token.slice(7, token.length);
 
   const secret = jwt.accessTokenSecret;
-
-  JWT.verify(token, secret, (err, payload) => {
-    req.payload = payload;
+  return new Promise((resolve, reject) => {
+    JWT.verify(token, secret, (err, payload) => {
+      req.payload = payload;
+      return resolve(payload);
+    });
+    return reject(null);
   });
-  return req.payload;
 };
 
 const revokeRefreshToken = async (userId) => {
