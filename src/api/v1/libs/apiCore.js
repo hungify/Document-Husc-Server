@@ -56,13 +56,18 @@ function filterByDateRange(queryObject) {
   return query;
 }
 
-function APICore(queryString, model) {
+function APICore(queryString, model, userId) {
   this.Model = model; // Model to query
   this.queryString = queryString; // Query string from client
   this.query = this.Model.find({
     isArchived: {
       $ne: true,
     },
+    isPublic: userId
+      ? {
+          $in: [true, false],
+        }
+      : true,
   }); // Query object
 
   this.paginating = () => {
