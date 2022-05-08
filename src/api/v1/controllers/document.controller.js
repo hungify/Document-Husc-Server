@@ -148,7 +148,8 @@ const createDocument = async (req, res, next) => {
 
 const getListDocuments = async (req, res, next) => {
   try {
-    const api = new APICore(req.query, Document)
+    const payload = await getPayload(req);
+    const api = new APICore(req.query, Document, payload?.userId)
       .paginating()
       .sorting()
       .searching()
@@ -189,7 +190,7 @@ const getDocumentDetail = async (req, res, next) => {
   try {
     const { documentId } = req.params;
     const { tab } = req.query;
-    const userId = getPayload(req, res, next)?.userId;
+    const payload = await getPayload(req);
 
     const foundDocument = await Document.findOne({
       _id: documentId,
@@ -233,9 +234,9 @@ const getDocumentDetail = async (req, res, next) => {
     let result = [];
     let myReadDate = null;
 
-    if (userId) {
+    if (payload?.userId) {
       const myUser = participants.find(
-        (p) => p?.receiver?._id.toString() === userId
+        (p) => p?.receiver?._id.toString() === payload.userId
       );
       myReadDate = myUser?.readDate;
     }
@@ -245,9 +246,9 @@ const getDocumentDetail = async (req, res, next) => {
         const participantsTree = [
           {
             root: true,
+            key: publisher._id,
             receiver: {
               username: publisher.username,
-              _id: publisher._id,
               issueDate,
             },
             children: [],
@@ -265,9 +266,9 @@ const getDocumentDetail = async (req, res, next) => {
         const participantsTree = [
           {
             root: true,
+            key: publisher._id,
             receiver: {
               username: publisher.username,
-              _id: publisher._id,
               issueDate,
             },
             children: tree,
@@ -299,7 +300,7 @@ const getDocumentDetail = async (req, res, next) => {
     } else if (tab === 'files') {
       result = fileList;
     } else if (tab === 'analytics') {
-      if (isPublic || !userId) {
+      if (isPublic || !payload?.userId) {
         result = [];
       } else {
         let read = [];

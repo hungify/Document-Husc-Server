@@ -41,6 +41,7 @@ module.exports = {
     return arr.reduce((acc, current) => {
       const key = current[parentKey][nestedKey].toString();
       delete current[parentKey];
+      current.key = current.receiver._id;
 
       if (map[key]) {
         map[key][wrapKey] = map[key][wrapKey] || [];
