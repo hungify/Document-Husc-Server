@@ -245,9 +245,9 @@ const getDocumentDetail = async (req, res, next) => {
         const participantsTree = [
           {
             root: true,
+            key: publisher._id,
             receiver: {
               username: publisher.username,
-              _id: publisher._id,
               issueDate,
             },
             children: [],
@@ -265,9 +265,9 @@ const getDocumentDetail = async (req, res, next) => {
         const participantsTree = [
           {
             root: true,
+            key: publisher._id,
             receiver: {
               username: publisher.username,
-              _id: publisher._id,
               issueDate,
             },
             children: tree,
