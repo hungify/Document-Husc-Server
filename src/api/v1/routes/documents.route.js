@@ -24,7 +24,15 @@ router
   .route('/:documentId')
   .get(
     paramValidation.objectId('documentId'),
-    documentController.getDocumentDetail
+    documentController.getDocumentDetails
+  )
+  .put(
+    verifyAccessToken,
+    verifyRoles(ROLES.admin),
+    upload.array('files', 5),
+    paramValidation.objectId('documentId'),
+    documentValidation.updateDocument,
+    documentController.updateDocument
   )
   .patch(
     verifyAccessToken,
