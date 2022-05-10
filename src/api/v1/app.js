@@ -19,7 +19,9 @@ const bootServer = () => {
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
 
-  app.use(cors(require('../../configs/cors.config')));
+  // app.use(cors(require('../../configs/cors.config')));
+  app.use(cors('*'));
+
   app.use('/api/v1', require('./routes'));
 
   app.get('/', (req, res, next) => {
