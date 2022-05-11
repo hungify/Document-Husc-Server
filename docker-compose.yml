@@ -1,25 +1,33 @@
-version: "3.3"
+version: '3.4'
 
 services:
-  node:
-    container_name: node_server
+  app:
+    container_name: node-server
     build:
       context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/app
+    command: yarn dev
+    env_file:
+      - .env.dev
     environment:
+      - PORT=${PORT}
+
+      - MONGO_DB_USERNAME=${MONGO_DB_USERNAME}
+      - MONGO_DB_PASSWORD=${MONGO_DB_PASSWORD}
       - MONGO_DB_HOST=${MONGO_DB_HOST}
       - MONGO_DB_PORT=${MONGO_DB_PORT}
       - MONGO_DB_NAME=${MONGO_DB_NAME}
-      - MONGO_DB_USERNAME=${MONGO_DB_USERNAME}
-      - MONGO_DB_PASSWORD=${MONGO_DB_PASSWORD}
       - MONGO_DB_AUTH_SOURCE=${MONGO_DB_AUTH_SOURCE}
+
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
-      - PORT=${PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_EXPIRE_IN=${REDIS_EXPIRE_IN}
+      - REDIS_CONNECT_TIMEOUT=${REDIS_CONNECT_TIMEOUT}
     ports:
-      - "${PORT}:${PORT}"
-    volumes:
-      - .:/app
-    command: yarn dev
+      - '${PORT}:${PORT}'
     restart: unless-stopped
     depends_on:
       - redis
@@ -32,21 +40,20 @@ services:
     image: mongo
     volumes:
       - .docker/data/db:/data/db
-      # - .docker/db-entrypoint.sh:/docker-entrypoint-initdb.d/db-entrypoint.sh
+      - .docker/db-entrypoint.sh:/docker-entrypoint-initdb.d/db-entrypoint.sh
     restart: unless-stopped
-    networks:
-      - db-network
     environment:
-      # - MONGO_INITDB_ROOT_USERNAME=${MONGO_DB_ROOT_USERNAME}
-      # - MONGO_INITDB_ROOT_PASSWORD=${MONGO_DB_ROOT_PASSWORD}
-      - MONGO_INITDB_ROOT_USERNAME=hung
-      - MONGO_INITDB_ROOT_PASSWORD=hung
-      - MONGO_DB_PORT=${MONGO_DB_PORT}
-      - MONGO_DB_NAME=${MONGO_DB_NAME}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_DB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_DB_ROOT_PASSWORD}
       - MONGO_DB_USERNAME=${MONGO_DB_USERNAME}
       - MONGO_DB_PASSWORD=${MONGO_DB_PASSWORD}
+      - MONGO_DB_HOST=${MONGO_DB_HOST}
+      - MONGO_DB_PORT=${MONGO_DB_PORT}
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
       - MONGO_DB_AUTH_SOURCE=${MONGO_DB_AUTH_SOURCE}
 
+    networks:
+      - db-network
   redis:
     image: redis:6.2-alpine
     volumes:
