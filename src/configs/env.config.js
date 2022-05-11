@@ -9,21 +9,21 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 module.exports = {
-  port: process.env.PORT || process.env.APP_PORT || 8888,
+  port: process.env.PORT || process.env.APP_PORT,
   mongoDB: {
-    username: process.env.MONGO_DB_USERNAME || '',
-    password: process.env.MONGO_DB_PASSWORD || '',
-    host: process.env.MONGO_DB_HOST || 'localhost',
-    port: process.env.MONGO_DB_PORT || 27017,
-    databaseName: process.env.MONGO_DB_NAME || 'test',
-    authSource: process.env.MONGO_DB_AUTH_SOURCE || 'admin',
+    username: process.env.MONGO_DB_USERNAME ,
+    password: process.env.MONGO_DB_PASSWORD ,
+    host: process.env.MONGO_DB_HOST ,
+    port: process.env.MONGO_DB_PORT,
+    databaseName: process.env.MONGO_DB_NAME,
+    authSource: process.env.MONGO_DB_AUTH_SOURCE ,
   },
   redis: {
-    host: process.env.REDIS_HOST || '127.0.0.1',
-    port: process.env.REDIS_PORT || 6379,
-    password: process.env.REDIS_PASSWORD || '',
-    expireIn: process.env.REDIS_EXPIRE_IN || 60 * 60 * 24,
-    connectTimeout: process.env.REDIS_CONNECT_TIMEOUT || 10000,
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+    password: process.env.REDIS_PASSWORD ,
+    expireIn: process.env.REDIS_EXPIRE_IN,
+    connectTimeout: process.env.REDIS_CONNECT_TIMEOUT,
   },
   jwt: {
     accessTokenSecret: process.env.ACCESS_TOKEN_SECRET || '',
