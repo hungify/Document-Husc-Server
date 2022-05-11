@@ -121,7 +121,6 @@ const updateReadDocument = async (req, res, next) => {
     }
 
     const readDate = req.body.readDate;
-    console.log('🚀 :: readDate', readDate);
 
     const foundDocument = await Document.findOne({ _id: documentId });
     if (!foundDocument) {
