@@ -128,7 +128,14 @@ function APICore(queryString, model, userId) {
     } else if (_.intersection(queryKeys, filterIdsKeys).length > 0) {
       const ids = queryObject.ids.split(',');
 
-      this.query = this.query.find({ _id: { $in: ids } });
+      const keys = ['category', 'agency', 'urgentLevel', 'typesOfDocument'];
+      const populates = keys.map((key) => {
+        return {
+          path: key,
+          select: 'value title label colorTag -_id',
+        };
+      });
+      this.query = this.query.find({ _id: { $in: ids } }).populate(populates);
       return this;
     } else if (!_.isEmpty(queryObject)) {
       queryObject.title.$options = 'i';

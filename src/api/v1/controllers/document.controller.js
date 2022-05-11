@@ -27,9 +27,10 @@ const createDocument = async (req, res, next) => {
       content,
       summary,
       relatedDocuments,
-      publisher,
       participants,
     } = req.body;
+
+    const publisher = req.payload?.userId;
 
     let participantsParsed = null;
     if (participants) {
@@ -146,6 +147,162 @@ const createDocument = async (req, res, next) => {
   }
 };
 
+const updateDocument = async (req, res, next) => {
+  try {
+    const {
+      //properties
+      documentNumber,
+      signer,
+      issueDate,
+      typesOfDocument,
+      urgentLevel,
+      agency,
+      category,
+
+      title,
+      content,
+      summary,
+      relatedDocuments,
+      participants,
+    } = req.body;
+
+    const publisher = req.payload?.userId;
+
+    const { documentId } = req.params;
+
+    if (!documentId) {
+      throw CreateError.BadRequest('Document id is required');
+    }
+
+    let participantsParsed = null;
+    if (participants) {
+      const participantsTemp = isJSON(participants)
+        ? JSON.parse(participants)
+        : participants;
+
+      if (Array.isArray(participantsTemp)) {
+        participantsParsed = _.filter(participantsTemp, (p) => {
+          return p.receiver !== publisher;
+        });
+      } else {
+        participantsParsed = participantsTemp;
+      }
+    }
+
+    // get reference to typeOfDocument
+    const foundTypeOfDocument = await TypeOfDocument.findOne({
+      value: typesOfDocument,
+    })
+      .select('_id')
+      .lean();
+
+    if (!foundTypeOfDocument) {
+      throw CreateError.BadRequest(
+        `Type of document "${typesOfDocument}" does not exist`
+      );
+    }
+
+    const foundAgency = await Agency.findOne({ value: agency })
+      .select('_id')
+      .lean();
+    if (!foundAgency) {
+      throw CreateError.BadRequest(`Agency "${agency}" does not exist`);
+    }
+
+    const foundCategory = await Category.findOne({ value: category })
+      .select('_id')
+      .lean();
+    if (!foundCategory) {
+      throw CreateError.BadRequest(`Category "${category}" does not exist`);
+    }
+
+    const foundUrgentLevel = await UrgentLevel.findOne({ value: urgentLevel })
+      .select('_id')
+      .lean();
+    if (!foundUrgentLevel) {
+      throw CreateError.BadRequest(
+        `Urgent level "${urgentLevel}" does not exist`
+      );
+    }
+
+    const relatedDocumentsList =
+      relatedDocuments && _.isString(relatedDocuments)
+        ? relatedDocuments.split(',')
+        : [];
+
+    if (relatedDocumentsList.length > 0) {
+      const countValidDocuments = await Document.countDocuments({
+        _id: { $in: relatedDocumentsList },
+      }).lean();
+
+      if (countValidDocuments !== relatedDocumentsList?.length) {
+        throw CreateError.BadRequest(
+          `Some of the related documents does not exist`
+        );
+      }
+    }
+
+    const foundPublisher = await User.findOne({ _id: publisher });
+    if (!foundPublisher) {
+      throw CreateError.BadRequest(`Publisher "${publisher}" does not exist`);
+    }
+
+    if (participantsParsed.length > 0) {
+      const countValidReceivers = await User.countDocuments({
+        _id: {
+          $in: participantsParsed?.map((r) => r.receiver),
+        },
+      });
+
+      if (countValidReceivers === 0) {
+        throw CreateError.BadRequest(`Some of the receivers does not exist`);
+      }
+    }
+
+    let files = [];
+    if (req.files) {
+      files = await uploadFiles(req.files);
+    }
+
+    const updatedDocument = await Document.findOneAndUpdate(
+      {
+        _id: documentId,
+      },
+      {
+        //properties
+        title,
+        documentNumber,
+        signer,
+        issueDate,
+        typesOfDocument: foundTypeOfDocument._id,
+        urgentLevel: foundUrgentLevel._id,
+        agency: foundAgency._id,
+        category: foundCategory._id,
+        isPublic: Array.isArray(participantsParsed) ? false : true,
+
+        title,
+        content,
+        summary,
+        fileList: files,
+        relatedDocuments: relatedDocumentsList,
+        participants: participantsParsed,
+
+        publisher,
+      },
+      {
+        new: true,
+      }
+    );
+
+    return res.status(201).json({
+      message: 'success',
+      data: updatedDocument,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getListDocuments = async (req, res, next) => {
   try {
     const payload = await getPayload(req);
@@ -186,11 +343,61 @@ const getListDocuments = async (req, res, next) => {
   }
 };
 
-const getDocumentDetail = async (req, res, next) => {
+const getDocumentDetails = async (req, res, next) => {
   try {
     const { documentId } = req.params;
     const { tab } = req.query;
     const payload = await getPayload(req);
+
+    if (!tab) {
+      // if tab is not defined, return all document details
+      const foundDocument = await Document.findOne({
+        _id: documentId,
+        isArchived: {
+          $eq: false,
+        },
+      })
+        .populate('agency', 'label value -_id')
+        .populate('category', 'title value -_id')
+        .populate('urgentLevel', 'label value  -_id')
+        .populate('typesOfDocument', 'label value -_id')
+        .select('-__v -createdAt -updatedAt')
+        .lean({ autopopulate: true });
+
+      if (!foundDocument) {
+        throw CreateError.BadRequest(`Document "${documentId}" does not exist`);
+      }
+
+      const property = {
+        agency: foundDocument.agency,
+        category: foundDocument.category,
+        typesOfDocument: foundDocument.typesOfDocument,
+        urgentLevel: foundDocument.urgentLevel,
+        documentNumber: foundDocument.documentNumber,
+        issueDate: foundDocument.issueDate,
+        signer: foundDocument.signer,
+        title: foundDocument.title,
+        content: foundDocument.content,
+        summary: foundDocument.summary,
+        publisher: foundDocument.publisher,
+        isPublic: foundDocument.isPublic,
+      };
+      const fileList = foundDocument.fileList;
+      const relatedDocuments = foundDocument.relatedDocuments;
+      const participants = foundDocument.participants
+        .map((p) => p.receiver)
+        .filter((item) => item);
+
+      return res.status(200).json({
+        message: 'success',
+        data: {
+          property,
+          fileList,
+          relatedDocuments,
+          participants,
+        },
+      });
+    }
 
     const foundDocument = await Document.findOne({
       _id: documentId,
@@ -391,7 +598,8 @@ const updateRelatedDocuments = async (req, res, next) => {
 
 module.exports = {
   createDocument,
+  updateDocument,
   getListDocuments,
-  getDocumentDetail,
+  getDocumentDetails,
   updateRelatedDocuments,
 };
