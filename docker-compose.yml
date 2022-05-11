@@ -1,0 +1,62 @@
+version: "3.3"
+
+services:
+  node:
+    container_name: node_server
+    build:
+      context: .
+    environment:
+      - MONGO_DB_HOST=${MONGO_DB_HOST}
+      - MONGO_DB_PORT=${MONGO_DB_PORT}
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+      - MONGO_DB_USERNAME=${MONGO_DB_USERNAME}
+      - MONGO_DB_PASSWORD=${MONGO_DB_PASSWORD}
+      - MONGO_DB_AUTH_SOURCE=${MONGO_DB_AUTH_SOURCE}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - PORT=${PORT}
+    ports:
+      - "${PORT}:${PORT}"
+    volumes:
+      - .:/app
+    command: yarn dev
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - db
+    networks:
+      - db-network
+      - cache-network
+
+  db:
+    image: mongo
+    volumes:
+      - .docker/data/db:/data/db
+      # - .docker/db-entrypoint.sh:/docker-entrypoint-initdb.d/db-entrypoint.sh
+    restart: unless-stopped
+    networks:
+      - db-network
+    environment:
+      # - MONGO_INITDB_ROOT_USERNAME=${MONGO_DB_ROOT_USERNAME}
+      # - MONGO_INITDB_ROOT_PASSWORD=${MONGO_DB_ROOT_PASSWORD}
+      - MONGO_INITDB_ROOT_USERNAME=hung
+      - MONGO_INITDB_ROOT_PASSWORD=hung
+      - MONGO_DB_PORT=${MONGO_DB_PORT}
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+      - MONGO_DB_USERNAME=${MONGO_DB_USERNAME}
+      - MONGO_DB_PASSWORD=${MONGO_DB_PASSWORD}
+      - MONGO_DB_AUTH_SOURCE=${MONGO_DB_AUTH_SOURCE}
+
+  redis:
+    image: redis:6.2-alpine
+    volumes:
+      - .docker/data/redis:/data
+    restart: unless-stopped
+    networks:
+      - cache-network
+
+networks:
+  cache-network:
+    driver: bridge
+  db-network:
+    driver: bridge
