@@ -9,7 +9,7 @@
   },
   "type": "commonjs",
   "scripts": {
-    "dev": "NODE_ENV=development nodemon server.js  ",
+    "dev": "nodemon server.js  ",
     "start": "NODE_ENV=production pm2 startOrRestart ecosystem.config.json --no-daemon"
   },
   "dependencies": {
