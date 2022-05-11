@@ -11,7 +11,7 @@ const path = require('path');
 /**
  * Get port from environment and store in Express.
  */
-const PORT = normalizePort(port || appPort);
+const PORT = normalizePort(port || 9999);
 app.set('port', PORT);
 
 /**
