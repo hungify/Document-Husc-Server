@@ -1,10 +1,10 @@
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config({
-    path: 'env.dev',
+    path: '.env.dev',
   });
 } else {
   require('dotenv').config({
-    path: 'env.prod',
+    path: '.env.prod',
   });
 }
 
