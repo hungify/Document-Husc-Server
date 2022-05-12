@@ -65,10 +65,19 @@ The back-end has support for Docker Compose. So if you want to run the back-end 
 
 ```
 docker-compose --env-file .env.dev up
+
 ```
 
-2. Stop and remove containers and networks
+3. Stop and remove containers and networks
 
 ```
 docker-compose --env-file .env.dev down
+
+```
+
+5. If you want connecting to MongDB inside docker container with GUI. Use connection string below
+
+```
+mongodb://*yourUser*:**yourPass**@localhost:27017/**yourDbName**?authSource=**yourDbName**
+
 ```
