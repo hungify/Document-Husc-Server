@@ -89,6 +89,7 @@ const getAllAgencies = async (req, res, next) => {
     return res.status(200).json({
       message: 'success',
       data: foundAgencies,
+      total: foundAgencies.length,
     });
   } catch (error) {
     next(error);

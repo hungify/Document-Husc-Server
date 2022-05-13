@@ -85,6 +85,7 @@ const getAllTypesOfDocuments = async (req, res, next) => {
     return res.status(200).json({
       message: 'success',
       data: foundTypesOfDocuments,
+      total: foundTypesOfDocuments.length,
     });
   } catch (error) {
     next(error);
