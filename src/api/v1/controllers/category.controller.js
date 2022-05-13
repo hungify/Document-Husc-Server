@@ -41,8 +41,9 @@ const createCategory = async (req, res, next) => {
 
 const updateCategory = async (req, res, next) => {
   try {
-    const { title, parentId } = req.body;
+    const { title } = req.body;
     const { categoryId } = req.params;
+
     const foundCategory = await Category.findById(categoryId);
     if (!foundCategory) {
       throw CreateError.NotFound(
@@ -60,23 +61,19 @@ const updateCategory = async (req, res, next) => {
       );
     }
 
-    const foundCategoryWithSameParentId = await Category.findOne({
-      _id: parentId,
-    }).lean();
-    if (!foundCategoryWithSameParentId && parentId !== null) {
-      throw CreateError.Conflict(
-        `Category with parentId "${parentId}" not found`
-      );
-    }
     const value = title
       .toLowerCase()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/[đĐ]/g, (m) => (m === 'đ' ? 'd' : 'D'))
       .replace(/\s/g, '-');
+
     const updatedCategory = await Category.findByIdAndUpdate(
       categoryId,
-      { title, value, parentId },
+      {
+        title,
+        value,
+      },
       { new: true }
     ).lean();
 
