@@ -1,5 +1,6 @@
 const CreateError = require('http-errors');
 const Category = require('../models/category.model');
+const { listToTreeSimple } = require('../utils');
 
 const createCategory = async (req, res, next) => {
   try {
@@ -91,9 +92,17 @@ const getAllCategories = async (req, res, next) => {
     const foundCategories = await Category.find({})
       .select('-__v -createdAt -updatedAt')
       .lean();
+
+    const categoriesTree = listToTreeSimple(
+      foundCategories,
+      '_id',
+      'children',
+      'parentId'
+    );
     return res.status(200).json({
       message: 'success',
-      data: foundCategories,
+      data: categoriesTree,
+      total: foundCategories.length,
     });
   } catch (error) {
     next(error);
