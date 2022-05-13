@@ -24,7 +24,9 @@ module.exports = {
   },
   toMap: (arr, childKey, nestedKey) => {
     const result = arr.reduce((prev, current) => {
-      const key = current[childKey][nestedKey].toString();
+      const key = nestedKey
+        ? current[childKey][nestedKey].toString()
+        : current[childKey];
       prev[key] = current;
       return prev;
     }, {});
@@ -39,9 +41,28 @@ module.exports = {
   ) => {
     const map = module.exports.toMap(arr, childKey, nestedKey);
     return arr.reduce((acc, current) => {
-      const key = current[parentKey][nestedKey].toString();
+      const key = nestedKey
+        ? current[parentKey][nestedKey]?.toString()
+        : current[parentKey];
+
       delete current[parentKey];
       current.key = current.receiver._id;
+
+      if (map[key]) {
+        map[key][wrapKey] = map[key][wrapKey] || [];
+        map[key][wrapKey].push(current);
+      } else {
+        acc.push(current);
+      }
+
+      return acc;
+    }, []);
+  },
+  listToTreeSimple(arr, childKey, wrapKey, parentKey) {
+    const map = module.exports.toMap(arr, childKey);
+
+    return arr.reduce((acc, current) => {
+      const key = current[parentKey];
 
       if (map[key]) {
         map[key][wrapKey] = map[key][wrapKey] || [];
