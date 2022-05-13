@@ -18,7 +18,7 @@ router
     categoryController.createCategory
   );
 
-router.route('/:categoryId').put(
+router.route('/:categoryId').patch(
   verifyAccessToken,
   verifyRoles(ROLES.admin),
   paramValidation.objectId('categoryId'),
