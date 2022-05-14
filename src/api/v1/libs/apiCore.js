@@ -167,6 +167,15 @@ function APICore(queryString, model, userId) {
       this.query = this.query.find(JSON.parse(queryStr));
       return this;
     } else {
+      const keys = ['category', 'agency', 'urgentLevel', 'typesOfDocument'];
+      const populates = keys.map((key) => {
+        return {
+          path: key,
+          select: 'value title label colorTag -_id',
+        };
+      });
+
+      this.query = this.query.populate(populates);
       return this;
     }
   };

@@ -109,10 +109,7 @@ const createDocument = async (req, res, next) => {
       }
     }
 
-    let files = [];
-    if (req.files) {
-      files = await uploadFiles(req.files);
-    }
+    const files = req.files ? await uploadFiles(req.files) : [];
 
     const newDocument = new Document({
       //properties
