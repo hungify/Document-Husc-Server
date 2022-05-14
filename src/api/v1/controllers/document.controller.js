@@ -313,11 +313,7 @@ const getListDocuments = async (req, res, next) => {
       .filtering();
 
     const result = await Promise.allSettled([
-      api.query
-        .select(
-          'agency category urgentLevel typesOfDocument documentNumber title signer issueDate fileList'
-        )
-        .lean({ autopopulate: true }),
+      api.query.lean({ autopopulate: true }),
       Document.countDocuments({}),
     ]);
 
