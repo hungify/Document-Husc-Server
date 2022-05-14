@@ -53,6 +53,7 @@ function filterByDateRange(queryObject) {
       range.map((item) => [item.compare, item.value])
     ),
   };
+
   return query;
 }
 
@@ -133,7 +134,15 @@ function APICore(queryString, model, userId) {
     ) {
       const query = filterByDateRange(queryObject);
 
-      this.query = this.query.find(query);
+      const keys = ['category', 'agency', 'urgentLevel', 'typesOfDocument'];
+      const populates = keys.map((key) => {
+        return {
+          path: key,
+          select: 'value title label colorTag -_id',
+        };
+      });
+
+      this.query = this.query.find(query).populate(populates);
       return this;
     } else if (_.intersection(queryKeys, filterIdsKeys).length > 0) {
       const ids = queryObject.ids.split(',');
@@ -146,6 +155,8 @@ function APICore(queryString, model, userId) {
         };
       });
       this.query = this.query.find({ _id: { $in: ids } }).populate(populates);
+      this.query = this.query.find({ _id: { $in: ids } });
+
       return this;
     } else if (!_.isEmpty(queryObject)) {
       let queryStr = JSON.stringify(queryObject);
@@ -156,14 +167,6 @@ function APICore(queryString, model, userId) {
       this.query = this.query.find(JSON.parse(queryStr));
       return this;
     } else {
-      const keys = ['category', 'agency', 'urgentLevel', 'typesOfDocument'];
-      const populates = keys.map((key) => {
-        return {
-          path: key,
-          select: 'value title label colorTag -_id',
-        };
-      });
-      this.query = this.query.populate(populates);
       return this;
     }
   };
