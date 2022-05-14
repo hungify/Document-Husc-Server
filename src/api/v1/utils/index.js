@@ -63,7 +63,7 @@ module.exports = {
 
     return arr.reduce((acc, current) => {
       const key = current[parentKey];
-
+      current.key = current._id;
       if (map[key]) {
         map[key][wrapKey] = map[key][wrapKey] || [];
         map[key][wrapKey].push(current);
