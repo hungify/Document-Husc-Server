@@ -61,9 +61,7 @@ function APICore(queryString, model, userId, type) {
   this.Model = model; // Model to query
   this.queryString = queryString; // Query string from client
   this.query = this.Model.find({
-    isArchived: {
-      $eq: type === 'archive' ? true : false,
-    },
+    type: type,
     isPublic: userId
       ? {
           $in: [true, false],

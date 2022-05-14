@@ -13,6 +13,8 @@ const createDocument = async (req, res, next) => {
       agency: Joi.string().required(),
       category: Joi.string().required(),
 
+      type: Joi.string().valid('official', 'draft', 'archive').required(),
+
       documentNumber: Joi.string().required(),
       signer: Joi.string().required(),
 
@@ -61,7 +63,7 @@ const createDocument = async (req, res, next) => {
     let body = {
       ...req.body,
     };
-    
+
     if (isJSON(req.body.participants)) {
       body.participants = JSON.parse(req.body.participants);
     }
@@ -91,11 +93,9 @@ const updateDocument = async (req, res, next) => {
       ), // Form data alway transfer array to empty string
       //properties
       validityStatus: Joi.string().valid('valid', 'invalid').default('valid'),
-
+      type: Joi.string().valid('official', 'draft', 'archive').required(),
       issueDate: Joi.date(),
-
       documentFrom: Joi.string().valid('input', 'attach'),
-
       participants: Joi.alternatives().try(
         Joi.array().items(
           Joi.object().keys({

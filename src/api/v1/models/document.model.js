@@ -12,6 +12,11 @@ const documentSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    type: {
+      type: String,
+      enum: ['draft', 'official', 'archive'],
+      required: true,
+    },
     issueDate: {
       type: Date,
       required: true,
@@ -36,7 +41,6 @@ const documentSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       required: true,
     },
-
     title: {
       type: String,
       required: true,
@@ -55,10 +59,6 @@ const documentSchema = new mongoose.Schema(
     isPublic: {
       type: Boolean,
       default: true,
-    },
-    isArchived: {
-      type: Boolean,
-      default: false,
     },
     relatedDocuments: [
       {
