@@ -21,6 +21,7 @@ module.exports = {
         ContentType: file.mimetype,
       };
     });
+
     const result = await Promise.all(
       params.map((param) => client.send(new PutObjectCommand(param)))
     );
