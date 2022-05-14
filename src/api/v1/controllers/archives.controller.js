@@ -49,9 +49,7 @@ const getDetailsArchive = async (req, res, next) => {
       // if tab is not defined, return all document details
       const foundDocument = await Document.findOne({
         _id: documentId,
-        isArchived: {
-          $eq: true,
-        },
+        type: 'archive',
       })
         .populate('agency', 'label value -_id')
         .populate('category', 'title value -_id')
@@ -97,9 +95,7 @@ const getDetailsArchive = async (req, res, next) => {
 
     const foundDocument = await Document.findOne({
       _id: documentId,
-      isArchived: {
-        $eq: false,
-      },
+      type: 'archive',
     })
       .populate('agency', 'label value -_id')
       .populate('category', 'title value -_id')
@@ -132,7 +128,7 @@ const getDetailsArchive = async (req, res, next) => {
       fileList,
       publisher,
       isPublic,
-      isArchived,
+      type,
     } = foundDocument;
     let result = [];
     let myReadDate = null;
@@ -198,7 +194,7 @@ const getDetailsArchive = async (req, res, next) => {
         summary,
         publisher,
         isPublic,
-        isArchived,
+        type,
       };
     } else if (tab === 'files') {
       result = fileList;
@@ -254,7 +250,6 @@ const getDetailsArchive = async (req, res, next) => {
 const restoreArchive = async (req, res, next) => {
   try {
     const { documentId } = req.params;
-    console.log('🚀 :: documentId', documentId);
 
     const foundDocument = await Document.findOne({
       _id: documentId,
@@ -269,7 +264,7 @@ const restoreArchive = async (req, res, next) => {
         _id: documentId,
       },
       {
-        isArchived: false,
+        type: 'official',
       }
     );
 
