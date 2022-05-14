@@ -59,6 +59,8 @@ services:
     image: redis:6.2-alpine
     volumes:
       - .docker/data/redis:/data
+    ports:
+      - '${REDIS_PORT}:${REDIS_PORT}'
     restart: unless-stopped
     networks:
       - cache-network
