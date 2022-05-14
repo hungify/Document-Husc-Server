@@ -589,10 +589,41 @@ const updateRelatedDocuments = async (req, res, next) => {
   }
 };
 
+const revokeDocument = async (req, res, next) => {
+  try {
+    const { documentId } = req.params;
+
+    const foundDocument = await Document.findOne({
+      _id: documentId,
+    });
+
+    if (!foundDocument) {
+      throw CreateError.NotFound(`Document "${documentId}" does not exist`);
+    }
+
+    const updateRevokeDocument = await Document.findOneAndUpdate(
+      {
+        _id: documentId,
+      },
+      {
+        isArchived: true,
+      }
+    );
+
+    return res.status(200).json({
+      message: 'success',
+      data: updateRevokeDocument,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createDocument,
   updateDocument,
   getListDocuments,
   getDocumentDetails,
   updateRelatedDocuments,
+  revokeDocument,
 };
