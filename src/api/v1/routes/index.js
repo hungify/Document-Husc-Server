@@ -29,4 +29,6 @@ router.use('/send', require('./send.route'));
 
 router.use('/dashboard', require('./dashboard.route'));
 
+router.use('/archives', require('./archives.route'));
+
 module.exports = router;
