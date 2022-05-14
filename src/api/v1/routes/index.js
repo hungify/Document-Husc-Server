@@ -31,4 +31,6 @@ router.use('/dashboard', require('./dashboard.route'));
 
 router.use('/archives', require('./archives.route'));
 
+router.use('/draft', require('./draft.route'));
+
 module.exports = router;
