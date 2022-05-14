@@ -28,6 +28,7 @@ const createDocument = async (req, res, next) => {
       summary,
       relatedDocuments,
       participants,
+      type,
     } = req.body;
 
     const publisher = req.payload?.userId;
@@ -129,7 +130,7 @@ const createDocument = async (req, res, next) => {
       fileList: files,
       relatedDocuments: relatedDocumentsList,
       participants: participantsParsed,
-
+      type,
       publisher,
     });
 
@@ -161,6 +162,7 @@ const updateDocument = async (req, res, next) => {
       summary,
       relatedDocuments,
       participants,
+      type,
     } = req.body;
 
     const publisher = req.payload?.userId;
@@ -283,7 +285,7 @@ const updateDocument = async (req, res, next) => {
         fileList: files,
         relatedDocuments: relatedDocumentsList,
         participants: participantsParsed,
-
+        type,
         publisher,
       },
       {
@@ -303,7 +305,7 @@ const updateDocument = async (req, res, next) => {
 const getListDocuments = async (req, res, next) => {
   try {
     const payload = await getPayload(req);
-    const api = new APICore(req.query, Document, payload?.userId)
+    const api = new APICore(req.query, Document, payload?.userId, 'official')
       .paginating()
       .sorting()
       .searching()
@@ -346,9 +348,7 @@ const getDocumentDetails = async (req, res, next) => {
       // if tab is not defined, return all document details
       const foundDocument = await Document.findOne({
         _id: documentId,
-        isArchived: {
-          $eq: false,
-        },
+        type: 'official',
       })
         .populate('agency', 'label value -_id')
         .populate('category', 'title value -_id')
@@ -394,9 +394,7 @@ const getDocumentDetails = async (req, res, next) => {
 
     const foundDocument = await Document.findOne({
       _id: documentId,
-      isArchived: {
-        $eq: false,
-      },
+      type: 'official',
     })
       .populate('agency', 'label value -_id')
       .populate('category', 'title value -_id')
@@ -429,7 +427,7 @@ const getDocumentDetails = async (req, res, next) => {
       fileList,
       publisher,
       isPublic,
-      isArchived,
+      type,
     } = foundDocument;
     let result = [];
     let myReadDate = null;
@@ -495,7 +493,7 @@ const getDocumentDetails = async (req, res, next) => {
         summary,
         publisher,
         isPublic,
-        isArchived,
+        type,
       };
     } else if (tab === 'files') {
       result = fileList;
@@ -555,9 +553,7 @@ const updateRelatedDocuments = async (req, res, next) => {
 
     const foundDocument = await Document.findOne({
       _id: documentId,
-      isArchived: {
-        $eq: false,
-      },
+      type: 'official',
     });
     if (!foundDocument) {
       throw CreateError.NotFound(`Document "${documentId}" does not exist`);
@@ -606,7 +602,7 @@ const revokeDocument = async (req, res, next) => {
         _id: documentId,
       },
       {
-        isArchived: true,
+        type: 'archive',
       }
     );
 
