@@ -110,7 +110,13 @@ function APICore(queryString, model, userId) {
       'typesOfDocument',
     ];
 
-    const filterRangeKeys = ['createdAt', 'updatedAt', 'start', 'end'];
+    const filterRangeKeys = [
+      'createdAt',
+      'updatedAt',
+      'start',
+      'end',
+      'orderBy',
+    ];
 
     const filterIdsKeys = ['ids'];
 
@@ -120,7 +126,11 @@ function APICore(queryString, model, userId) {
       this.query = this.query.populate(populates);
 
       return this;
-    } else if (_.intersection(queryKeys, filterRangeKeys).length > 0) {
+    } else if (
+      _.intersection(queryKeys, filterRangeKeys).length > 0 &&
+      queryObject.start &&
+      queryObject.end
+    ) {
       const query = filterByDateRange(queryObject);
 
       this.query = this.query.find(query);
@@ -138,7 +148,6 @@ function APICore(queryString, model, userId) {
       this.query = this.query.find({ _id: { $in: ids } }).populate(populates);
       return this;
     } else if (!_.isEmpty(queryObject)) {
-      queryObject.title.$options = 'i';
       let queryStr = JSON.stringify(queryObject);
       queryStr = queryStr.replace(
         /\b(gte|gt|lt|lte|regex)\b/g,
