@@ -30,6 +30,7 @@ const createDocument = async (req, res, next) => {
       participants,
       type,
     } = req.body;
+    console.log('🚀 ::  req.body', req.body);
 
     const publisher = req.payload?.userId;
 
@@ -53,24 +54,24 @@ const createDocument = async (req, res, next) => {
       value: typesOfDocument,
     });
 
-    if (!foundTypeOfDocument) {
+    if (!foundTypeOfDocument && type === 'official') {
       throw CreateError.BadRequest(
         `Type of document "${typesOfDocument}" does not exist`
       );
     }
 
     const foundAgency = await Agency.findOne({ value: agency });
-    if (!foundAgency) {
+    if (!foundAgency && type === 'official') {
       throw CreateError.BadRequest(`Agency "${agency}" does not exist`);
     }
 
     const foundCategory = await Category.findOne({ value: category });
-    if (!foundCategory) {
+    if (!foundCategory && type === 'official') {
       throw CreateError.BadRequest(`Category "${category}" does not exist`);
     }
 
     const foundUrgentLevel = await UrgentLevel.findOne({ value: urgentLevel });
-    if (!foundUrgentLevel) {
+    if (!foundUrgentLevel && type === 'official') {
       throw CreateError.BadRequest(
         `Urgent level "${urgentLevel}" does not exist`
       );
@@ -81,7 +82,7 @@ const createDocument = async (req, res, next) => {
         ? relatedDocuments.split(',')
         : [];
 
-    if (relatedDocumentsList.length > 0) {
+    if (relatedDocumentsList?.length > 0) {
       const countValidDocuments = await Document.countDocuments({
         _id: { $in: relatedDocumentsList },
       }).lean();
@@ -98,7 +99,7 @@ const createDocument = async (req, res, next) => {
       throw CreateError.BadRequest(`Publisher "${publisher}" does not exist`);
     }
 
-    if (participantsParsed.length > 0) {
+    if (participantsParsed?.length > 0) {
       const countValidReceivers = await User.countDocuments({
         _id: {
           $in: participantsParsed?.map((r) => r.receiver),
@@ -118,13 +119,12 @@ const createDocument = async (req, res, next) => {
       documentNumber,
       signer,
       issueDate,
-      typesOfDocument: foundTypeOfDocument._id,
-      urgentLevel: foundUrgentLevel._id,
-      agency: foundAgency._id,
-      category: foundCategory._id,
+      typesOfDocument: foundTypeOfDocument?._id,
+      urgentLevel: foundUrgentLevel?._id,
+      agency: foundAgency?._id,
+      category: foundCategory?._id,
       isPublic: Array.isArray(participantsParsed) ? false : true,
 
-      title,
       content,
       summary,
       fileList: files,

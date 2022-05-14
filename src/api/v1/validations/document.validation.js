@@ -7,58 +7,115 @@ Joi.objectId = require('joi-objectid')(Joi);
 const createDocument = async (req, res, next) => {
   const documentSchema = Joi.object()
     .keys({
-      //properties
-      typesOfDocument: Joi.string().required(),
-      urgentLevel: Joi.string().required(),
-      agency: Joi.string().required(),
-      category: Joi.string().required(),
-
       type: Joi.string().valid('official', 'draft', 'archive').required(),
-
-      documentNumber: Joi.string().required(),
-      signer: Joi.string().required(),
-
-      title: Joi.string().required(),
-      relatedDocuments: Joi.alternatives()
-        .try(Joi.array().items(Joi.objectId()), Joi.string().allow(''))
-        .required(), // Form data alway transfer array to empty string
-      //properties
-      validityStatus: Joi.string().valid('valid', 'invalid').default('valid'),
-
-      issueDate: Joi.date().required(),
-
       documentFrom: Joi.string().valid('input', 'attach').required(),
+    })
+    .when('.type', {
+      is: 'official',
+      then: Joi.object()
+        .keys({
+          //classification
+          typesOfDocument: Joi.string().required(),
+          urgentLevel: Joi.string().required(),
+          agency: Joi.string().required(),
+          category: Joi.string().required(),
 
-      participants: Joi.alternatives()
-        .try(
-          Joi.array().items(
+          //properties
+          documentNumber: Joi.string().required(),
+          signer: Joi.string().required(),
+          title: Joi.string().required(),
+          validityStatus: Joi.string()
+            .valid('valid', 'invalid')
+            .default('valid'),
+          issueDate: Joi.date().required(),
+
+          //related documents
+          relatedDocuments: Joi.alternatives()
+            .try(Joi.array().items(Joi.objectId()), Joi.string().allow(''))
+            .required(), // Form data alway transfer array to empty string
+
+          participants: Joi.alternatives()
+            .try(
+              Joi.array().items(
+                Joi.object().keys({
+                  sender: Joi.objectId().required(),
+                  sendDate: Joi.date().required(),
+                  readDate: Joi.date().default(null),
+                  receiver: Joi.objectId(),
+                })
+              ),
+              Joi.object().keys({
+                sender: Joi.objectId().required(),
+                sendDate: Joi.date().required(),
+              })
+            )
+            .required(),
+        })
+        .when('.documentFrom', {
+          is: 'input',
+          then: Joi.object().keys({
+            content: Joi.string().required(),
+          }),
+        })
+        .when('.documentFrom', {
+          is: 'attach',
+          then: Joi.object().keys({
+            summary: Joi.string().required(),
+          }),
+        }),
+    })
+    .when('.type', {
+      is: 'draft',
+      then: Joi.object()
+        .keys({
+          //classification
+          typesOfDocument: Joi.string(),
+          urgentLevel: Joi.string(),
+          agency: Joi.string(),
+          category: Joi.string(),
+
+          //properties
+          documentNumber: Joi.string(),
+          signer: Joi.string(),
+          title: Joi.string(),
+          validityStatus: Joi.string()
+            .valid('valid', 'invalid')
+            .default('valid'),
+          issueDate: Joi.date(),
+
+          //related documents
+          relatedDocuments: Joi.alternatives().try(
+            Joi.array().items(Joi.objectId()),
+            Joi.string().allow('')
+          ), // Form data alway transfer array to empty string
+          participants: Joi.alternatives().try(
+            Joi.array().items(
+              Joi.object().keys({
+                sender: Joi.objectId(),
+                sendDate: Joi.date(),
+                readDate: Joi.date().default(null),
+                receiver: Joi.objectId(),
+              })
+            ),
             Joi.object().keys({
-              sender: Joi.objectId().required(),
-              sendDate: Joi.date().required(),
-              readDate: Joi.date().default(null),
-              receiver: Joi.objectId(),
+              sender: Joi.objectId(),
+              sendDate: Joi.date(),
             })
           ),
-          Joi.object().keys({
-            sender: Joi.objectId().required(),
-            sendDate: Joi.date().required(),
-          })
-        )
-        .required(),
-    })
-    .when('.documentFrom', {
-      is: 'input',
-      then: Joi.object().keys({
-        content: Joi.string().required(),
-      }),
-    })
-    .when('.documentFrom', {
-      is: 'attach',
-      then: Joi.object().keys({
-        summary: Joi.string().required(),
-      }),
+        })
+        .when('.documentFrom', {
+          is: 'input',
+          then: Joi.object().keys({
+            content: Joi.string(),
+          }),
+        })
+        .when('.documentFrom', {
+          is: 'attach',
+          then: Joi.object().keys({
+            summary: Joi.string(),
+          }),
+        }),
     });
-
   try {
     let body = {
       ...req.body,

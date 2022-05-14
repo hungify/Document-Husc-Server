@@ -3,47 +3,87 @@ const { connectToMongoLocal } = require('../../../configs/db.config');
 
 const documentSchema = new mongoose.Schema(
   {
-    //Properties
-    documentNumber: {
-      type: String,
-      required: true,
-    },
-    signer: {
-      type: String,
-      required: true,
-    },
     type: {
       type: String,
       enum: ['draft', 'official', 'archive'],
       required: true,
     },
+    //Properties
+    documentNumber: {
+      type: String,
+      required: [
+        function () {
+          return this.type === 'official';
+        },
+        'documentNumber is required if type is official',
+      ],
+    },
+    signer: {
+      type: String,
+      required: [
+        function () {
+          return this.type === 'official';
+        },
+        'signer is required if type is official',
+      ],
+    },
     issueDate: {
       type: Date,
-      required: true,
+      required: [
+        function () {
+          return this.type === 'official';
+        },
+        'issueDate is required if type is official',
+      ],
     },
     typesOfDocument: {
       ref: 'TypesOfDocuments',
       type: mongoose.Schema.Types.ObjectId,
-      required: true,
+      required: [
+        function () {
+          return this.type === 'official';
+        },
+        'typesOfDocument is required if type is official',
+      ],
     },
     urgentLevel: {
       ref: 'UrgentLevel',
       type: mongoose.Schema.Types.ObjectId,
-      required: true,
+      required: [
+        function () {
+          return this.type === 'official';
+        },
+        'urgentLevel is required if type is official',
+      ],
     },
     agency: {
       ref: 'Agencies',
       type: mongoose.Schema.Types.ObjectId,
-      required: true,
+      required: [
+        function () {
+          return this.type === 'official';
+        },
+        'agency is required if type is official',
+      ],
     },
     category: {
       ref: 'Categories',
       type: mongoose.Schema.Types.ObjectId,
-      required: true,
+      required: [
+        function () {
+          return this.type === 'official';
+        },
+        'category is required if type is official',
+      ],
     },
     title: {
       type: String,
-      required: true,
+      required: [
+        function () {
+          return this.type === 'official';
+        },
+        'title is required if type is official',
+      ],
     },
     content: {
       type: String,
@@ -58,7 +98,12 @@ const documentSchema = new mongoose.Schema(
     },
     isPublic: {
       type: Boolean,
-      default: true,
+      required: [
+        function () {
+          return this.type === 'official';
+        },
+        'isPublic is required if type is official',
+      ],
     },
     relatedDocuments: [
       {
@@ -71,7 +116,12 @@ const documentSchema = new mongoose.Schema(
       ref: 'Users',
       type: mongoose.Schema.Types.ObjectId,
       autopopulate: { select: 'username avatar email _id' },
-      required: true,
+      required: [
+        function () {
+          return this.type === 'official';
+        },
+        'publisher is required if type is official',
+      ],
     },
     participants: [
       {
