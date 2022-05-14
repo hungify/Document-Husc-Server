@@ -37,8 +37,15 @@ router
   .patch(
     verifyAccessToken,
     verifyRoles(ROLES.admin),
+    paramValidation.objectId('documentId'),
     documentValidation.updateRelatedDocuments,
     documentController.updateRelatedDocuments
+  )
+  .delete(
+    verifyAccessToken,
+    verifyRoles(ROLES.admin),
+    paramValidation.objectId('documentId'),
+    documentController.revokeDocument
   );
 
 module.exports = router;
