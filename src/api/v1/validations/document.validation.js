@@ -61,7 +61,7 @@ const createDocument = async (req, res, next) => {
     let body = {
       ...req.body,
     };
-
+    
     if (isJSON(req.body.participants)) {
       body.participants = JSON.parse(req.body.participants);
     }
