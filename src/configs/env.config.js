@@ -1,12 +1,4 @@
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config({
-    path: '.env.dev',
-  });
-} else {
-  require('dotenv').config({
-    path: '.env.prod',
-  });
-}
+require('dotenv');
 
 module.exports = {
   port: process.env.PORT || process.env.APP_PORT,

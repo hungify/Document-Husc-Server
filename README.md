@@ -56,7 +56,7 @@ DocumentKHH is a website used to lookup, track, manage, store documents and redu
 ### Manual Setup
 
 1. Git clone and Open source code via Editor
-2. Create `env.dev` and the format should be as given in `.env.example`
+2. Create `.env` and the format should be as given in `.env.example`
 3. Run `npm install`
 4. Run `npm start`
 
@@ -64,18 +64,25 @@ DocumentKHH is a website used to lookup, track, manage, store documents and redu
 
 The back-end has support for Docker Compose. So if you want to run the back-end in a container, you need do:
 
-1. Setup environment variables in `.env.dev` file. Note when you use Docker setup and run the database in localhost (host machine)
-2. Build the Docker image and Run container
+1. Setup environment variables in `.env` file. Note when you use Docker setup and run the database in localhost (host machine)
+2. Build image
 
 ```
-docker-compose --env-file .env.dev up
+docker build -t server-node:latest .
+
+```
+
+3. Run container
+
+```
+docker-compose up
 
 ```
 
 3. Stop and remove containers and networks
 
 ```
-docker-compose --env-file .env.dev down
+docker-compose down
 
 ```
 
