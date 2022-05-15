@@ -1,6 +1,6 @@
 # DocumentKHH
 
-DocumentKHH is a website used to lookup, receive, track, manage and store documents and reduce paper at Hue university
+DocumentKHH is a website used to lookup, track, manage, store documents and reduce paper at Hue university
 
 ## Table of contents
 
