@@ -57,8 +57,19 @@ DocumentKHH is a website used to lookup, track, manage, store documents and redu
 
 1. Git clone and Open source code via Editor
 2. Create `.env` and the format should be as given in `.env.example`
-3. Run `npm install`
-4. Run `npm start`
+3. Generate a self-signed SSL certificate for https, run command below
+
+```
+openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes \
+  -keyout localhost.key -out localhost.crt -subj "/CN=localhost" \
+  -addext "subjectAltName=DNS:localhost,DNS:localhostt,IP:10.0.0.1"
+```
+
+- Enter password and verify password
+- It will then prompt you for things like "Country Name", but you can just hit Enter and accept the defaults.
+
+4. Run `npm install`
+5. Run `npm start`
 
 ### Docker setup
 
@@ -69,26 +80,22 @@ The back-end has support for Docker Compose. So if you want to run the back-end 
 
 ```
 docker build -t server-node:latest .
-
 ```
 
 3. Run container
 
 ```
 docker-compose up
-
 ```
 
 3. Stop and remove containers and networks
 
 ```
 docker-compose down
-
 ```
 
 5. If you want connecting to MongDB inside docker container with GUI, use connection string below
 
 ```
 mongodb://*yourUser*:**yourPass**@localhost:27017/**yourDbName**?authSource=**yourDbName**
-
 ```
