@@ -60,6 +60,7 @@ DocumentKHH is a website used to lookup, track, manage, store documents and redu
 3. Generate a self-signed SSL certificate for https, run command below
 
 ```
+mkdir security && cd security
 openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes \
   -keyout localhost.key -out localhost.crt -subj "/CN=localhost" \
   -addext "subjectAltName=DNS:localhost,DNS:localhostt,IP:10.0.0.1"
