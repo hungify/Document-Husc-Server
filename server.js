@@ -20,8 +20,8 @@ app.set('port', PORT);
 
 const server = https.createServer(
   {
-    key: fs.readFileSync(path.join(__dirname, './src/configs/ssl/key.pem')),
-    cert: fs.readFileSync(path.join(__dirname, './src/configs/ssl/cert.pem')),
+    key: fs.readFileSync('./security/localhost.key'),
+    cert: fs.readFileSync('./security/localhost.crt'),
   },
   app
 );
