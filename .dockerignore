@@ -22,3 +22,5 @@
 **/values.dev.yaml
 README.md
 .docker
+.dockerignore
+Dockerfile

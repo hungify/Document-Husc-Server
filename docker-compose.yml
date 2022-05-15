@@ -2,15 +2,7 @@ version: '3.4'
 
 services:
   app:
-    container_name: node-server
-    build:
-      context: .
-      dockerfile: Dockerfile
-    volumes:
-      - ./:/app
-    command: yarn dev
-    env_file:
-      - .env.dev
+    image: server-node:latest
     environment:
       - PORT=${PORT}
 
