@@ -43,6 +43,10 @@ DocumentKHH is a website used to lookup, receive, track, manage and store docume
 
 #### Send
 
+#### Draft
+
+#### Archives
+
 #### Dashboard
 
 ## Screenshots
