@@ -30,7 +30,6 @@ const createDocument = async (req, res, next) => {
       participants,
       type,
     } = req.body;
-    console.log('🚀 ::  req.body', req.body);
 
     const publisher = req.payload?.userId;
 
