@@ -11,6 +11,7 @@ const { errorHandler, multerErrorHandler } = require('./middlewares/error');
 
 const bootServer = () => {
   const app = express();
+
   app.use(helmet());
   app.use(xss());
   app.use(mongoSanitize());
