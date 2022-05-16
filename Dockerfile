@@ -4,10 +4,12 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm i
 
 COPY . .
 
 RUN npm install -g pm2
 
-CMD ["npm", "dev"]
+EXPOSE 8000
+
+CMD ["npm", "start"]
