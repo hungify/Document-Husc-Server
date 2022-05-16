@@ -2,7 +2,11 @@ version: '3.4'
 
 services:
   api:
-    image: server-node:latest
+    # image: server-node:latest
+    container_name: api
+    build:
+      context: .
+      dockerfile: Dockerfile
     environment:
       - PORT=${PORT}
 
@@ -18,6 +22,11 @@ services:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
       - REDIS_EXPIRE_IN=${REDIS_EXPIRE_IN}
       - REDIS_CONNECT_TIMEOUT=${REDIS_CONNECT_TIMEOUT}
+
+      - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
+      - ACCESS_TOKEN_EXPIRES_IN=${ACCESS_TOKEN_EXPIRES_IN}
+      - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
+      - REFRESH_TOKEN_EXPIRES_IN=${REFRESH_TOKEN_EXPIRES_IN}
     ports:
       - '${PORT}:${PORT}'
     restart: unless-stopped

@@ -7,7 +7,9 @@ const {
   onListening,
 } = require('./src/configs/port.config');
 const fs = require('fs');
-const path = require('path');
+const { Server } = require('socket.io');
+const socketServices = require('./src/api/v1/services/chat.service');
+
 /**
  * Get port from environment and store in Express.
  */
@@ -18,7 +20,7 @@ app.set('port', PORT);
  * Create HTTP server.
  */
 
-const server = https.createServer(
+const httpsServer = https.createServer(
   {
     key: fs.readFileSync('./security/localhost.key'),
     cert: fs.readFileSync('./security/localhost.crt'),
@@ -26,14 +28,22 @@ const server = https.createServer(
   app
 );
 
+const io = new Server(httpsServer, {
+  /* options */
+});
+
+global.__basedir = __dirname;
+global._io = io;
+global._io.on('connection', socketServices.connection);
+
 /**
  * Listen on provided port, on all network interfaces.
  */
 
 app.on('ready', () => {
-  server.listen(PORT, () => {
+  httpsServer.listen(PORT, () => {
     console.log('Server listening on port ' + PORT);
   });
 });
-server.on('error', (error) => onError(error, PORT));
-server.on('listening', () => onListening(server));
+httpsServer.on('error', (error) => onError(error, PORT));
+httpsServer.on('listening', () => onListening(httpsServer));

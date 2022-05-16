@@ -10,4 +10,4 @@ COPY . .
 
 RUN npm install -g pm2
 
-CMD ["npm", "start"]
+CMD ["npm", "dev"]
