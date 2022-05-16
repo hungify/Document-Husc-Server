@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const archivesController = require('../controllers/archives.controller');
+const archivesController = require('../controllers/archive.controller');
 const { verifyAccessToken } = require('../middlewares/jwt');
 const verifyRoles = require('../middlewares/roles');
 const paramValidation = require('../validations/param.validation');
