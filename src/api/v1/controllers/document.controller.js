@@ -30,7 +30,6 @@ const createDocument = async (req, res, next) => {
       participants,
       type,
     } = req.body;
-    console.log('🚀 ::  req.body', req.body);
 
     const publisher = req.payload?.userId;
 
@@ -111,7 +110,7 @@ const createDocument = async (req, res, next) => {
       }
     }
 
-    const files = req.files ? await uploadFiles(req.files) : [];
+    const files = req.files?.length > 0 ? await uploadFiles(req.files) : [];
 
     const newDocument = new Document({
       //properties
