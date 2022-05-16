@@ -83,16 +83,16 @@ The back-end has support for Docker Compose. So if you want to run the back-end 
 docker build -t server-node:latest .
 ```
 
-3. Run container
+3. Run container 
 
 ```
-docker-compose up
+docker compose -f docker-compose-dev.yml up
 ```
 
 3. Stop and remove containers and networks
 
 ```
-docker-compose down
+docker compose -f docker-compose-dev.yml down
 ```
 
 5. If you want connecting to MongDB inside docker container with GUI, use connection string below
