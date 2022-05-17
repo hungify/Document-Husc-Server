@@ -89,7 +89,7 @@ docker build -t server-node:latest .
 docker compose -f docker-compose-dev.yml up
 ```
 
-3. Stop and remove containers and networks
+4. Stop and remove containers and networks
 
 ```
 docker compose -f docker-compose-dev.yml down
