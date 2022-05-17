@@ -343,19 +343,34 @@ const getDocumentDetails = async (req, res, next) => {
     const { tab } = req.query;
     const payload = await getPayload(req);
 
+    const foundDocument = await Document.findOne({
+      _id: documentId,
+      type: 'official',
+    })
+      .populate('agency', 'label value -_id')
+      .populate('category', 'title value -_id')
+      .populate('urgentLevel', 'label value colorTag -_id')
+      .populate('typesOfDocument', 'label value -_id')
+      .populate({
+        path: 'relatedDocuments',
+        populate: [
+          {
+            path: 'agency',
+            select: 'label value -_id',
+          },
+          {
+            path: 'urgentLevel',
+            select: 'label value colorTag -_id',
+          },
+        ],
+        select:
+          'documentNumber signer title issueDate fileList urgentLevel publisher ',
+      })
+      .select('-__v -createdAt -updatedAt')
+      .lean({ autopopulate: true });
+
     if (!tab) {
       // if tab is not defined, return all document details
-      const foundDocument = await Document.findOne({
-        _id: documentId,
-        type: 'official',
-      })
-        .populate('agency', 'label value -_id')
-        .populate('category', 'title value -_id')
-        .populate('urgentLevel', 'label value  -_id')
-        .populate('typesOfDocument', 'label value -_id')
-        .select('-__v -createdAt -updatedAt')
-        .lean({ autopopulate: true });
-
       if (!foundDocument) {
         throw CreateError.BadRequest(`Document "${documentId}" does not exist`);
       }
@@ -390,22 +405,6 @@ const getDocumentDetails = async (req, res, next) => {
         },
       });
     }
-
-    const foundDocument = await Document.findOne({
-      _id: documentId,
-      type: 'official',
-    })
-      .populate('agency', 'label value -_id')
-      .populate('category', 'title value -_id')
-      .populate('urgentLevel', 'label value colorTag -_id')
-      .populate('typesOfDocument', 'label value -_id')
-      .populate({
-        path: 'relatedDocuments',
-        select:
-          'documentNumber signer title issueDate fileList urgentLevel publisher ',
-      })
-      .select('-__v -createdAt -updatedAt')
-      .lean({ autopopulate: true });
 
     if (!foundDocument) {
       throw CreateError.NotFound(`Document "${documentId}" does not exist`);
