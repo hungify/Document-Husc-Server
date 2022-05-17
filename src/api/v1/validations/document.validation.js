@@ -60,7 +60,7 @@ const createDocument = async (req, res, next) => {
         .when('.documentFrom', {
           is: 'attach',
           then: Joi.object().keys({
-            summary: Joi.string().required(),
+            summary: Joi.string(),
           }),
         }),
     })
