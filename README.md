@@ -23,7 +23,7 @@ DocumentKHH is a website used to lookup, track, manage, store documents and redu
 
 ## Endpoints
 
-### `{API_URL}/api`
+### `{API_URL}/api/v1`
 
 #### Auths
 
@@ -66,9 +66,6 @@ openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes \
   -addext "subjectAltName=DNS:localhost,DNS:localhostt,IP:10.0.0.1"
 ```
 
-- Enter password and verify password
-- It will then prompt you for things like "Country Name", but you can just hit Enter and accept the defaults.
-
 4. Run `npm install`
 5. Run `npm start`
 
@@ -83,13 +80,13 @@ The back-end has support for Docker Compose. So if you want to run the back-end 
 docker build -t server-node:latest .
 ```
 
-3. Run container 
+3. Run container
 
 ```
 docker compose -f docker-compose-dev.yml up
 ```
 
-3. Stop and remove containers and networks
+4. Stop and remove containers and networks
 
 ```
 docker compose -f docker-compose-dev.yml down
