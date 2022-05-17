@@ -23,7 +23,7 @@ DocumentKHH is a website used to lookup, track, manage, store documents and redu
 
 ## Endpoints
 
-### `{API_URL}/api`
+### `{API_URL}/api/v1`
 
 #### Auths
 
