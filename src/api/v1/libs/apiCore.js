@@ -73,7 +73,9 @@ function APICore(queryString, model, userId, type) {
     const page = parseInt(this.queryString.page, 10) || 1;
     const limit = parseInt(this.queryString.limit, 10) || 10;
     const skip = (page - 1) * limit;
+
     this.query = this.query.limit(limit).skip(skip);
+
     return this;
   };
 
