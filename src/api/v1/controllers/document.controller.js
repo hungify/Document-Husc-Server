@@ -479,6 +479,7 @@ const getDocumentDetails = async (req, res, next) => {
       result = relatedDocuments;
     } else if (tab === 'property') {
       result = {
+        _id: documentId,
         agency,
         category,
         typesOfDocument,

@@ -74,25 +74,42 @@ openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes \
 The back-end has support for Docker Compose. So if you want to run the back-end in a container, you need do:
 
 1. Setup environment variables in `.env` file. Note when you use Docker setup and run the database in localhost (host machine)
-2. Build image
 
-```
-docker build -t server-node:latest .
-```
+- Development via nodemon
 
-3. Run container
+  2. Run container
 
-```
-docker compose -f docker-compose-dev.yml up
-```
+  ```
+  docker compose -f docker-compose-dev.yml up
+  ```
 
-4. Stop and remove containers and networks
+  3. Stop and remove containers and networks
 
-```
-docker compose -f docker-compose-dev.yml down
-```
+  ```
+  docker compose -f docker-compose-dev.yml down
+  ```
 
-5. If you want connecting to MongDB inside docker container with GUI, use connection string below
+- Production via pm2
+
+  2. Build image
+
+  ```
+  docker build -t server-node:latest .
+  ```
+
+  3. Run container
+
+  ```
+  docker compose up
+  ```
+
+  4. Stop and remove containers and networks
+
+  ```
+  docker compose down
+  ```
+
+**If you want connecting to MongDB inside docker container with GUI, use connection string below**
 
 ```
 mongodb://*yourUser*:**yourPass**@localhost:27017/**yourDbName**?authSource=**yourDbName**
