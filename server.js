@@ -33,10 +33,7 @@ const io = new Server(httpsServer, {
   /* options */
 });
 
-global.__basedir = __dirname;
-global._io = io;
 initSocket(io);
-// global._io.on('connection', socketServices.connection);
 
 /**
  * Listen on provided port, on all network interfaces.
