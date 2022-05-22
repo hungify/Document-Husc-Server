@@ -162,6 +162,12 @@ const documentSchema = new mongoose.Schema(
     conversation: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Conversations',
+      required: [
+        function () {
+          return this.type === 'official' && this.participants?.receiver;
+        },
+        'Conversations is required if type is official and participants.receiver is defined',
+      ],
     },
   },
   { autoIndex: false, timestamps: true }

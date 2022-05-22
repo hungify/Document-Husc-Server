@@ -3,12 +3,7 @@ const { connectToMongoLocal } = require('../../../configs/db.config');
 
 const messageSchema = new mongoose.Schema(
   {
-    conversation: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Conversation',
-      required: true,
-    },
-    body: {
+    content: {
       type: String,
       required: true,
     },

@@ -9,6 +9,7 @@ const {
 const fs = require('fs');
 const { Server } = require('socket.io');
 const socketServices = require('./src/api/v1/services/chat.service');
+const initSocket = require('./src/api/v1/services/chat.service');
 
 /**
  * Get port from environment and store in Express.
@@ -34,7 +35,8 @@ const io = new Server(httpsServer, {
 
 global.__basedir = __dirname;
 global._io = io;
-global._io.on('connection', socketServices.connection);
+initSocket(io);
+// global._io.on('connection', socketServices.connection);
 
 /**
  * Listen on provided port, on all network interfaces.
