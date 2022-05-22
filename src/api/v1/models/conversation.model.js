@@ -3,22 +3,18 @@ const { connectToMongoLocal } = require('../../../configs/db.config');
 
 const conversationSchema = new mongoose.Schema(
   {
-    members: {
-      type: [
-        {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Users',
-        },
-      ],
-    },
-    messages: {
-      type: [
-        {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Messages',
-        },
-      ],
-    },
+    members: [
+      {
+        ref: 'Users',
+        type: mongoose.Schema.Types.ObjectId,
+      },
+    ],
+    messages: [
+      {
+        ref: 'Messages',
+        type: mongoose.Schema.Types.ObjectId,
+      },
+    ],
   },
   { timestamps: true }
 );

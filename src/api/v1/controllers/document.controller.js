@@ -3,6 +3,7 @@ const Document = require('../models/document.model');
 const TypeOfDocument = require('../models/typeOfDocument.model');
 const Agency = require('../models/agency.model');
 const Category = require('../models/category.model');
+const Conversation = require('../models/conversation.model');
 const User = require('../models/user.model');
 const { UrgentLevel } = require('../models/ugentLevel.model');
 const APICore = require('../libs/apiCore');
@@ -10,6 +11,7 @@ const { uploadFiles } = require('../utils/s3');
 const { isJSON, removeEmptyObjInArrByKeys, listToTree } = require('../utils');
 const _ = require('lodash');
 const { getPayload } = require('../middlewares/jwt');
+const TABS = require('../constants/tabs');
 
 const createDocument = async (req, res, next) => {
   try {
@@ -111,6 +113,14 @@ const createDocument = async (req, res, next) => {
     }
 
     const files = req.files?.length > 0 ? await uploadFiles(req.files) : [];
+    let newConversation;
+    if (Array.isArray(participantsParsed) && type === 'official') {
+      newConversation = new Conversation({
+        messages: [],
+        members: [publisher],
+      });
+      await newConversation.save();
+    }
 
     const newDocument = new Document({
       //properties
@@ -131,6 +141,7 @@ const createDocument = async (req, res, next) => {
       participants: participantsParsed,
       type,
       publisher,
+      conversation: newConversation ? newConversation._id : null,
     });
 
     const savedDocument = await newDocument.save();
@@ -366,6 +377,13 @@ const getDocumentDetails = async (req, res, next) => {
         select:
           'documentNumber signer title issueDate fileList urgentLevel publisher ',
       })
+      .populate({
+        path: 'conversation',
+        populate: {
+          path: 'messages',
+          select: 'content sender receiver -_id',
+        },
+      })
       .select('-__v -createdAt -updatedAt')
       .lean({ autopopulate: true });
 
@@ -426,6 +444,7 @@ const getDocumentDetails = async (req, res, next) => {
       publisher,
       isPublic,
       type,
+      conversation,
     } = foundDocument;
     let result = [];
     let myReadDate = null;
@@ -437,7 +456,7 @@ const getDocumentDetails = async (req, res, next) => {
       myReadDate = myUser?.readDate;
     }
 
-    if (tab === 'participants') {
+    if (tab === TABS.PARTICIPANTS) {
       if (isPublic) {
         const participantsTree = [
           {
@@ -472,12 +491,12 @@ const getDocumentDetails = async (req, res, next) => {
         ];
         result = participantsTree;
       }
-    } else if (tab === 'relatedDocuments') {
+    } else if (tab === TABS.RELATED_DOCUMENTS) {
       if (relatedDocuments.length > 0) {
         delete relatedDocuments[0].participants;
       }
       result = relatedDocuments;
-    } else if (tab === 'property') {
+    } else if (tab === TABS.PROPERTY) {
       result = {
         _id: documentId,
         agency,
@@ -494,9 +513,9 @@ const getDocumentDetails = async (req, res, next) => {
         isPublic,
         type,
       };
-    } else if (tab === 'files') {
+    } else if (tab === TABS.FILES) {
       result = fileList;
-    } else if (tab === 'analytics') {
+    } else if (tab === TABS.ANALYTICS) {
       if (isPublic || !payload?.userId) {
         result = [];
       } else {
@@ -529,6 +548,11 @@ const getDocumentDetails = async (req, res, next) => {
           },
         };
       }
+    } else if (tab === TABS.CHAT_ROOM) {
+      result = {
+        messages: conversation.messages,
+        conversationId: conversation._id,
+      };
     } else {
       result = foundDocument;
     }
