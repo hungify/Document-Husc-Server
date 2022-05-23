@@ -381,17 +381,22 @@ const getDocumentDetails = async (req, res, next) => {
         path: 'conversation',
         populate: {
           path: 'messages',
-          select: 'content sender receiver -_id',
+          select: 'content sender receiver createdAt -_id',
+          populate: {
+            path: 'sender',
+            select: 'username avatar _id',
+          },
         },
       })
       .select('-__v -createdAt -updatedAt')
       .lean({ autopopulate: true });
 
+    if (!foundDocument) {
+      throw CreateError.BadRequest(`Document "${documentId}" does not exist`);
+    }
+
     if (!tab) {
       // if tab is not defined, return all document details
-      if (!foundDocument) {
-        throw CreateError.BadRequest(`Document "${documentId}" does not exist`);
-      }
 
       const property = {
         agency: foundDocument.agency,
@@ -424,9 +429,6 @@ const getDocumentDetails = async (req, res, next) => {
       });
     }
 
-    if (!foundDocument) {
-      throw CreateError.NotFound(`Document "${documentId}" does not exist`);
-    }
     const {
       agency,
       category,
@@ -448,12 +450,17 @@ const getDocumentDetails = async (req, res, next) => {
     } = foundDocument;
     let result = [];
     let myReadDate = null;
+    let myConversation = null;
 
     if (payload?.userId) {
       const myUser = participants.find(
         (p) => p?.receiver?._id.toString() === payload.userId
       );
       myReadDate = myUser?.readDate;
+      myConversation = {
+        messages: conversation?.messages,
+        conversationId: conversation?._id,
+      };
     }
 
     if (tab === TABS.PARTICIPANTS) {
@@ -549,10 +556,7 @@ const getDocumentDetails = async (req, res, next) => {
         };
       }
     } else if (tab === TABS.CHAT_ROOM) {
-      result = {
-        messages: conversation.messages,
-        conversationId: conversation._id,
-      };
+      result = myConversation;
     } else {
       result = foundDocument;
     }
