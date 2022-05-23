@@ -1,14 +1,15 @@
 const EVENTS = {
-  connection: 'connection',
+  CONNECTION: 'connection',
   CLIENT: {
-    CREATE_ROOM: 'CREATE_ROOM',
-    SEND_ROOM_MESSAGE: 'SEND_ROOM_MESSAGE',
-    JOIN_ROOM: 'JOIN_ROOM',
+    CREATE_ROOM: 'event://client/create-room',
+    SEND_ROOM_MESSAGE: 'event://client/send-room-message',
+    JOIN_ROOM: 'event://client/join-room',
+    ERROR: 'event://client/error',
   },
   SERVER: {
-    ROOMS: 'ROOMS',
-    JOINED_ROOM: 'JOINED_ROOM',
-    ROOM_MESSAGE: 'ROOM_MESSAGE',
+    ROOMS: 'event://server/rooms',
+    JOINED_ROOM: 'event://server/joined-room',
+    ROOM_MESSAGE: 'event://server/room-message',
   },
 };
 
