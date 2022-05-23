@@ -5,9 +5,12 @@ const URI = `mongodb://${mongoDB.username}:${mongoDB.password}@${mongoDB.host}:$
 
 const newConnection = (uri) => {
   const conn = mongoose.createConnection(uri, {
-    serverSelectionTimeoutMS: 3000,
+    serverSelectionTimeoutMS: 5000,
     useUnifiedTopology: true,
+    socketTimeoutMS: 45000,
     useNewUrlParser: true,
+    keepAlive: true,
+    keepAliveInitialDelay: 300000,
   });
 
   conn.on('connected', () => {
@@ -19,7 +22,14 @@ const newConnection = (uri) => {
   });
 
   conn.on('disconnected', () => {
-    console.log('MongoDB disconnected');
+    mongoose.connect(URI, {
+      serverSelectionTimeoutMS: 5000,
+      useUnifiedTopology: true,
+      socketTimeoutMS: 45000,
+      useNewUrlParser: true,
+      keepAlive: true,
+      keepAliveInitialDelay: 300000,
+    });
   });
 
   process.on('SIGINT', async () => {
