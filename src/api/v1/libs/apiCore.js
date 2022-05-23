@@ -87,9 +87,8 @@ function APICore(queryString, model, userId, type) {
 
   this.searching = () => {
     if (this.queryString.q) {
-      const textNormalize = accents.remove(this.queryString.q);
-      const searchTerm = '"' + textNormalize + '"';
-      this.query = this.Model.searchFull(searchTerm);
+      const { q } = this.queryString;
+      this.query = this.Model.searchFull(q);
     } else {
       this.query = this.query.find();
     }
@@ -155,7 +154,6 @@ function APICore(queryString, model, userId, type) {
         };
       });
       this.query = this.query.find({ _id: { $in: ids } }).populate(populates);
-      this.query = this.query.find({ _id: { $in: ids } });
 
       return this;
     } else if (!_.isEmpty(queryObject)) {
@@ -164,7 +162,14 @@ function APICore(queryString, model, userId, type) {
         /\b(gte|gt|lt|lte|regex)\b/g,
         (match) => '$' + match
       );
-      this.query = this.query.find(JSON.parse(queryStr));
+      const keys = ['category', 'agency', 'urgentLevel', 'typesOfDocument'];
+      const populates = keys.map((key) => {
+        return {
+          path: key,
+          select: 'value title label colorTag -_id',
+        };
+      });
+      this.query = this.query.find(JSON.parse(queryStr)).populate(populates);
       return this;
     } else {
       const keys = ['category', 'agency', 'urgentLevel', 'typesOfDocument'];
