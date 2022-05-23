@@ -1,54 +1,79 @@
 const Conversation = require('../models/conversation.model');
 const Message = require('../models/message.model');
 const EVENTS = require('../constants/events');
+const { jwt } = require('../../../configs/env.config');
+const JWT = require('jsonwebtoken');
+const createError = require('http-errors');
 
-const rooms = new Set();
+const conversations = new Set();
 
-function initSocket(io) {
-  io.on(EVENTS.connection, (socket) => {
-    socket.emit(EVENTS.SERVER.ROOMS, Array.from(rooms));
-
-    socket.on(EVENTS.CLIENT.CREATE_ROOM, ({ roomId }) => {
-      if (!rooms.has(roomId)) {
-        rooms.add(roomId);
+const initSocket = (io) => {
+  io.use(async (socket, next) => {
+    try {
+      const token = socket.handshake.auth?.headers?.authorization;
+      if (token) {
+        const secret = jwt.accessTokenSecret;
+        const payload = await JWT.verify(token, secret);
+        if (payload) {
+          next();
+        }
+      } else {
+        next(createError.Unauthorized('Token is missing'));
       }
+    } catch (error) {
+      next(createError.Unauthorized());
+    }
+  });
 
-      socket.join(roomId);
+  io.on(EVENTS.CONNECTION, (socket) => {
+    socket.emit(EVENTS.SERVER.ROOMS, Array.from(conversations));
 
-      socket.emit(EVENTS.SERVER.JOINED_ROOM, roomId);
+    socket.on(EVENTS.CLIENT.CREATE_ROOM, ({ conversationId }) => {
+      if (!conversations.has(conversationId)) {
+        conversations.add(conversationId);
+      }
+      socket.join(conversationId);
+      socket.emit(EVENTS.SERVER.JOINED_ROOM, conversationId);
     });
 
     socket.on(
       EVENTS.CLIENT.SEND_ROOM_MESSAGE,
-      async ({ roomId, message, username, sender }) => {
+      async (
+        { conversationId, content, username, senderId, avatar },
+        callback
+      ) => {
         const foundConversation = await Conversation.findOne({
-          _id: roomId,
+          _id: conversationId,
         });
 
         if (foundConversation) {
           const newMessage = new Message({
-            content: message,
-            sender,
+            content,
+            sender: senderId,
           });
           await newMessage.save();
 
           const updateConversation = await Conversation.updateOne(
-            { _id: roomId },
+            { _id: conversationId },
             {
               $push: {
                 messages: [newMessage._id],
               },
               $addToSet: {
-                members: [sender],
+                members: [senderId],
               },
             }
           );
           if (updateConversation.modifiedCount > 0) {
-            const date = new Date();
-            socket.to(roomId).emit(EVENTS.SERVER.ROOM_MESSAGE, {
-              message,
+            socket.to(conversationId).emit(EVENTS.SERVER.ROOM_MESSAGE, {
+              content,
               username,
-              time: `${date.getHours()}:${date.getMinutes()}`,
+              avatar,
+              senderId,
+              createdAt: newMessage.createdAt,
+            });
+            callback({
+              status: 'ok',
             });
           }
         }
@@ -61,6 +86,6 @@ function initSocket(io) {
       socket.emit(EVENTS.SERVER.JOINED_ROOM, roomId);
     });
   });
-}
+};
 
 module.exports = initSocket;

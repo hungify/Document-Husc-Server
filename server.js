@@ -8,9 +8,7 @@ const {
 } = require('./src/configs/port.config');
 const fs = require('fs');
 const { Server } = require('socket.io');
-const socketServices = require('./src/api/v1/services/chat.service');
 const initSocket = require('./src/api/v1/services/chat.service');
-
 /**
  * Get port from environment and store in Express.
  */
