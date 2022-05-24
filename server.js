@@ -9,6 +9,7 @@ const {
 const fs = require('fs');
 const { Server } = require('socket.io');
 const initSocket = require('./src/api/v1/services/chat.service');
+const { whitelist } = require('./src/configs/cors.config');
 /**
  * Get port from environment and store in Express.
  */
@@ -28,7 +29,10 @@ const httpsServer = https.createServer(
 );
 
 const io = new Server(httpsServer, {
-  /* options */
+  cors: {
+    origin: whitelist,
+    methods: ['GET', 'POST', 'OPTIONS'],
+  },
 });
 
 initSocket(io);

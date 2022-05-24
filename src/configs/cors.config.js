@@ -1,7 +1,4 @@
-const whitelist = [
-  'http://localhost:3000',
-  'https://document-management.vercel.app',
-];
+export const whitelist = ['http://localhost:3000', 'https://qlvb.vercel.app'];
 
 const corsOptions = {
   origin: (origin, callback) => {
