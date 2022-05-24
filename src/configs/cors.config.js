@@ -1,4 +1,4 @@
-export const whitelist = ['http://localhost:3000', 'https://qlvb.vercel.app'];
+const whitelist = ['http://localhost:3000', 'https://qlvb.vercel.app'];
 
 const corsOptions = {
   origin: (origin, callback) => {
@@ -11,4 +11,4 @@ const corsOptions = {
   optionsSuccessStatus: 200,
 };
 
-module.exports = corsOptions;
+module.exports = { corsOptions, whitelist };
