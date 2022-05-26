@@ -82,15 +82,17 @@ The back-end has support for Docker Compose. So if you want to run the back-end 
 
 1. Setup environment variables in `.env` file. Note when you use Docker setup and run the database in localhost (host machine)
 
+ **Choose one of the option below**
+ 
 - Development via nodemon
 
-  2. Run container
+  1. Run container
 
   ```
   docker compose -f docker-compose-dev.yml up
   ```
 
-  3. Stop and remove containers and networks
+  2. Stop and remove containers and networks
 
   ```
   docker compose -f docker-compose-dev.yml down
@@ -98,19 +100,19 @@ The back-end has support for Docker Compose. So if you want to run the back-end 
 
 - Production via pm2
 
-  2. Build image
+  1. Build image
 
   ```
   docker build -t server-node:latest .
   ```
 
-  3. Run container
+  2. Run container
 
   ```
   docker compose up
   ```
 
-  4. Stop and remove containers and networks
+  3. Stop and remove containers and networks
 
   ```
   docker compose down
