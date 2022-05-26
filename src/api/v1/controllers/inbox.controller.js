@@ -2,6 +2,7 @@ const CreateError = require('http-errors');
 const Document = require('../models/document.model');
 const User = require('../models/user.model');
 const _ = require('lodash');
+const redisQuery = require('../utils/redis');
 
 const getInboxDocuments = async (req, res, next) => {
   try {
@@ -132,7 +133,7 @@ const updateReadDocument = async (req, res, next) => {
       throw CreateError.NotFound(`Receiver "${userId}" does not exist`);
     }
 
-    const updateReadDocument = await Document.updateOne(
+    const updateReadDocument = await Document.findOneAndUpdate(
       {
         _id: documentId,
         participants: {
@@ -150,6 +151,8 @@ const updateReadDocument = async (req, res, next) => {
         new: true,
       }
     ).lean();
+
+    redisQuery.updateRedisValue(`document:${documentId}`, updateReadDocument);
 
     return res.status(200).json({
       message: 'success',

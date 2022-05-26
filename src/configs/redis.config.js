@@ -22,16 +22,4 @@ redisClient.on('error', function (err) {
   } else console.log('Redis error: ' + err.message);
 });
 
-const setWithTTL = (key, value, ttlSeconds = 60) => {
-  return redisClient.set(key, JSON.stringify(value), 'EX', ttlSeconds);
-};
-
-const getRedisValue = (key) => {
-  return redisClient.get(key);
-};
-
-const deleteRedisValue = (key) => {
-  return redisClient.del(key);
-};
-
-module.exports = { redisClient, setWithTTL, getRedisValue, deleteRedisValue };
+module.exports = redisClient;
