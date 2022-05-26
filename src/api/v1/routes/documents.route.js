@@ -6,6 +6,7 @@ const upload = require('../middlewares/multer');
 const { verifyAccessToken } = require('../middlewares/jwt');
 const verifyRoles = require('../middlewares/roles');
 const ROLES = require('../../../configs/roles.config');
+const cache = require('../middlewares/cache');
 
 const router = express.Router();
 
@@ -24,6 +25,7 @@ router
   .route('/:documentId')
   .get(
     paramValidation.objectId('documentId'),
+    cache.cacheDocumentDetail,
     documentController.getDocumentDetails
   )
   .put(

@@ -25,7 +25,7 @@ const createTypesOfDocuments = async (req, res, next) => {
       data: savedTypesOfDocument,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -73,7 +73,7 @@ const updateTypesOfDocuments = async (req, res, next) => {
       data: updatedTypesOfDocument,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -88,7 +88,7 @@ const getAllTypesOfDocuments = async (req, res, next) => {
       total: foundTypesOfDocuments.length,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 

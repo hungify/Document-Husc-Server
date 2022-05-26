@@ -36,7 +36,7 @@ const getListDraft = async (req, res, next) => {
       data: documents,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 

@@ -8,9 +8,9 @@ const updateReadDocument = async (req, res, next) => {
   });
   try {
     await documentSchema.validateAsync(req.body);
-    next();
+    return next();
   } catch (error) {
-    next(CreateError.BadRequest(error.message));
+    return next(CreateError.BadRequest(error.message));
   }
 };
 

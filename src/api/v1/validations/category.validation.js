@@ -9,9 +9,9 @@ const createCategory = async (req, res, next) => {
   });
   try {
     await categorySchema.validateAsync(req.body);
-    next();
+    return next();
   } catch (error) {
-    next(CreateError(error.message));
+    return next(CreateError.BadRequest(error.message));
   }
 };
 
@@ -22,9 +22,9 @@ const updateCategory = async (req, res, next) => {
   });
   try {
     await categorySchema.validateAsync(req.body);
-    next();
+    return next();
   } catch (error) {
-    next(CreateError(error.message));
+    return next(CreateError.BadRequest(error.message));
   }
 };
 

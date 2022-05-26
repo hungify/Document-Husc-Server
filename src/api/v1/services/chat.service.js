@@ -15,7 +15,7 @@ const initSocket = (io) => {
         const secret = jwt.accessTokenSecret;
         const payload = await JWT.verify(token, secret);
         if (payload) {
-          next();
+          return next();
         }
       } else {
         next(createError.Unauthorized('Token is missing'));

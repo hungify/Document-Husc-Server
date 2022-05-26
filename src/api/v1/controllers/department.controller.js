@@ -28,7 +28,7 @@ const createDepartment = async (req, res, next) => {
       data: savedDepartment,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -44,7 +44,7 @@ const getDepartments = async (req, res, next) => {
       data: departments,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -79,7 +79,7 @@ const updateDepartment = async (req, res, next) => {
       data: updatedDepartment,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 

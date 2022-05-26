@@ -44,9 +44,9 @@ userSchema.pre('save', async function (next) {
     const salt = await bcryptjs.genSaltSync(10);
     const hashedPassword = await bcryptjs.hashSync(this.password, salt);
     this.password = hashedPassword;
-    next();
+    return next();
   } catch (error) {
-    next(error);
+    return next(error);
   }
 });
 
@@ -54,7 +54,7 @@ userSchema.methods.isMatchPassword = async function (password) {
   try {
     return await bcryptjs.compareSync(password, this.password);
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 

@@ -27,7 +27,7 @@ const createAgency = async (req, res, next) => {
       data: savedAgency,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -64,7 +64,7 @@ const updateAgency = async (req, res, next) => {
       data: updatedAgency,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -77,7 +77,7 @@ const deleteAgency = async (req, res, next) => {
       message: 'success',
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -92,7 +92,7 @@ const getAllAgencies = async (req, res, next) => {
       total: foundAgencies.length,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 

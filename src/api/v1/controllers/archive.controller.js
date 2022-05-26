@@ -35,7 +35,7 @@ const getListArchives = async (req, res, next) => {
       data: documents,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -243,7 +243,7 @@ const getDetailsArchive = async (req, res, next) => {
       isPublic,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -273,7 +273,7 @@ const restoreArchive = async (req, res, next) => {
       data: updateRestoreDocument,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 

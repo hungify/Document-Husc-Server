@@ -9,9 +9,9 @@ const createDepartment = async (req, res, next) => {
 
   try {
     await departmentSchema.validateAsync(req.body);
-    next();
+    return next();
   } catch (error) {
-    next(CreateError.BadRequest(error.message));
+    return next(CreateError.BadRequest(error.message));
   }
 };
 
@@ -21,9 +21,9 @@ const updateDepartment = async (req, res, next) => {
   });
   try {
     await departmentSchema.validateAsync(req.body);
-    next();
+    return next();
   } catch (error) {
-    next(CreateError.BadRequest(error.message));
+    return next(CreateError.BadRequest(error.message));
   }
 };
 

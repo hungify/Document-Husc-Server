@@ -1,6 +1,6 @@
 const createError = require('http-errors');
 const JWT = require('jsonwebtoken');
-const redisLocal = require('../../../configs/redis.config');
+const { setWithTTL, getRedisValue } = require('../../../configs/redis.config');
 const { jwt, redis } = require('../../../configs/env.config');
 
 const signInAccessToken = ({ userId, role }) => {
@@ -36,7 +36,7 @@ const verifyAccessToken = (req, res, next) => {
       }
     }
     req.payload = payload;
-    next();
+    return next();
   });
 };
 
@@ -52,9 +52,8 @@ const signInRefreshToken = ({ userId, role }) => {
     JWT.sign(payload, secret, options, async (err, token) => {
       if (err) return reject(err);
       try {
-        await redisLocal.set(userId.toString(), token);
         const redisExpiresIn = redis.expireIn;
-        await redisLocal.expire(userId.toString(), redisExpiresIn);
+        await setWithTTL(userId, token, redisExpiresIn);
 
         return resolve(token);
       } catch (err) {
@@ -77,7 +76,7 @@ const verifyRefreshToken = (refreshToken) => {
           }
           return reject(err);
         }
-        const reply = await redisLocal.get(payload.userId);
+        const reply = await getRedisValue(payload.userId);
         if (reply === refreshToken) {
           return resolve(payload);
         }
@@ -108,7 +107,7 @@ const getPayload = (req) => {
 const revokeRefreshToken = async (userId) => {
   try {
     if (!userId) return;
-    await redisLocal.del(userId);
+    await redisClient.del(userId);
   } catch (error) {
     return reject(createError.InternalServerError(error.message));
   }

@@ -11,9 +11,9 @@ const createUrgentLevel = async (req, res, next) => {
   });
   try {
     await urgentLevelSchema.validateAsync(req.body);
-    next();
+    return next();
   } catch (error) {
-    next(CreateError(error.message));
+    return next(CreateError.BadRequest(error.message));
   }
 };
 
@@ -24,9 +24,9 @@ const updateUrgentLevel = async (req, res, next) => {
   });
   try {
     await urgentLevelSchema.validateAsync(req.body);
-    next();
+    return next();
   } catch (error) {
-    next(CreateError(error.message));
+    return next(CreateError.BadRequest(error.message));
   }
 };
 
