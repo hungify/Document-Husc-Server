@@ -24,7 +24,7 @@ const createUrgentLevel = async (req, res, next) => {
       data: savedUrgentLevel,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -72,7 +72,7 @@ const updateUrgentLevel = async (req, res, next) => {
       data: updatedUrgentLevel,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -84,7 +84,7 @@ const getAllUrgentLevels = async (req, res, next) => {
       data: foundUrgentLevels,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 

@@ -34,7 +34,7 @@ const register = async (req, res, next) => {
       data: savedUser,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 const login = async (req, res, next) => {
@@ -72,7 +72,7 @@ const login = async (req, res, next) => {
       },
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -98,7 +98,7 @@ const refreshToken = async (req, res, next) => {
       },
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -120,7 +120,7 @@ const logout = async (req, res, next) => {
       message: 'success',
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 

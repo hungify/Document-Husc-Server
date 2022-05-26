@@ -89,7 +89,7 @@ const getAnalytics = async (req, res, next) => {
       data: result,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 module.exports = {

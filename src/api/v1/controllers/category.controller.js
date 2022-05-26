@@ -36,7 +36,7 @@ const createCategory = async (req, res, next) => {
       data: savedCategory,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -83,7 +83,7 @@ const updateCategory = async (req, res, next) => {
       data: updatedCategory,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -105,7 +105,7 @@ const getAllCategories = async (req, res, next) => {
       total: foundCategories.length,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 

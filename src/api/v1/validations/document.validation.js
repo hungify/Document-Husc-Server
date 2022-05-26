@@ -125,9 +125,9 @@ const createDocument = async (req, res, next) => {
       body.participants = JSON.parse(req.body.participants);
     }
     await documentSchema.validateAsync(body);
-    next();
+    return next();
   } catch (error) {
-    next(CreateError.BadRequest(error.message));
+    return next(CreateError.BadRequest(error.message));
   }
 };
 
@@ -190,9 +190,9 @@ const updateDocument = async (req, res, next) => {
       body.participants = JSON.parse(req.body.participants);
     }
     await documentSchema.validateAsync(body);
-    next();
+    return next();
   } catch (error) {
-    next(CreateError.BadRequest(error.message));
+    return next(CreateError.BadRequest(error.message));
   }
 };
 
@@ -204,9 +204,9 @@ const getListDocuments = async (req, res, next) => {
   });
   try {
     await documentSchema.validateAsync(req.query);
-    next();
+    return next();
   } catch (error) {
-    next(CreateError.BadRequest(error.message));
+    return next(CreateError.BadRequest(error.message));
   }
 };
 
@@ -219,9 +219,9 @@ const getDocumentByFilter = async (req, res, next) => {
   });
   try {
     await documentSchema.validateAsync(req.query);
-    next();
+    return next();
   } catch (error) {
-    next(CreateError.BadRequest(error.message));
+    return next(CreateError.BadRequest(error.message));
   }
 };
 
@@ -238,9 +238,9 @@ const updateRelatedDocuments = async (req, res, next) => {
       paramSchema.validateAsync(req.params),
     ]);
 
-    next();
+    return next();
   } catch (error) {
-    next(CreateError.BadRequest(error.message));
+    return next(CreateError.BadRequest(error.message));
   }
 };
 

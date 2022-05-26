@@ -7,9 +7,9 @@ const createAgency = async (req, res, next) => {
   });
   try {
     await agencySchema.validateAsync(req.body);
-    next();
+    return next();
   } catch (error) {
-    next(CreateError(error.message));
+    return next(CreateError.BadRequest(error.message));
   }
 };
 
@@ -19,9 +19,9 @@ const updateAgency = async (req, res, next) => {
   });
   try {
     await agencySchema.validateAsync(req.body);
-    next();
+    return next();
   } catch (error) {
-    next(CreateError(error.message));
+    return next(CreateError.BadRequest(error.message));
   }
 };
 

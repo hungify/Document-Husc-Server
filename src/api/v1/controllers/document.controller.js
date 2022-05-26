@@ -12,6 +12,7 @@ const { isJSON, removeEmptyObjInArrByKeys, listToTree } = require('../utils');
 const _ = require('lodash');
 const { getPayload } = require('../middlewares/jwt');
 const TABS = require('../constants/tabs');
+const { redisClient, setWithTTL } = require('../../../configs/redis.config');
 
 const createDocument = async (req, res, next) => {
   try {
@@ -151,7 +152,7 @@ const createDocument = async (req, res, next) => {
       data: savedDocument,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -308,7 +309,7 @@ const updateDocument = async (req, res, next) => {
       data: updatedDocument,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -344,7 +345,7 @@ const getListDocuments = async (req, res, next) => {
       data: realDocs,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -391,13 +392,14 @@ const getDocumentDetails = async (req, res, next) => {
       .select('-__v -createdAt -updatedAt')
       .lean({ autopopulate: true });
 
+    await setWithTTL(`document:${documentId}`, foundDocument, 60 * 60 * 24);
+
     if (!foundDocument) {
       throw CreateError.BadRequest(`Document "${documentId}" does not exist`);
     }
 
     if (!tab) {
       // if tab is not defined, return all document details
-
       const property = {
         agency: foundDocument.agency,
         category: foundDocument.category,
@@ -569,7 +571,7 @@ const getDocumentDetails = async (req, res, next) => {
       isPublic,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -608,7 +610,7 @@ const updateRelatedDocuments = async (req, res, next) => {
       data: updateRelatedDocuments,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -638,7 +640,7 @@ const revokeDocument = async (req, res, next) => {
       data: updateRevokeDocument,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
