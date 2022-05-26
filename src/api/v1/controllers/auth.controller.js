@@ -114,7 +114,7 @@ const logout = async (req, res, next) => {
     }
 
     const payload = await verifyRefreshToken(refreshToken);
-    await revokeRefreshToken(payload.userId);
+    await revokeRefreshToken(payload?.userId);
 
     return res.status(200).json({
       message: 'success',
