@@ -14,7 +14,7 @@ const cacheDocumentDetail = async (req, res, next) => {
       await getRedisValue(`document:${documentId}`)
     );
 
-    if (!entryDocument) {
+    if (!entryDocument || tab === TABS.CHAT_ROOM) {
       return next();
     }
     if (!tab) {
