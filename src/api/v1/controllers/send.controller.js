@@ -137,7 +137,7 @@ const forwardDocument = async (req, res, next) => {
       }
     });
 
-    const updatedDocument = await Document.findOneAndUpdate(
+    const updatedReceiverDocument = await Document.findOneAndUpdate(
       {
         _id: documentId,
         'participants.$.sender': userId,
@@ -156,9 +156,44 @@ const forwardDocument = async (req, res, next) => {
       {
         new: true,
       }
-    );
+    )
+      .populate('agency', 'label value -_id')
+      .populate('category', 'title value -_id')
+      .populate('urgentLevel', 'label value colorTag -_id')
+      .populate('typesOfDocument', 'label value -_id')
+      .populate({
+        path: 'relatedDocuments',
+        populate: [
+          {
+            path: 'agency',
+            select: 'label value -_id',
+          },
+          {
+            path: 'urgentLevel',
+            select: 'label value colorTag -_id',
+          },
+        ],
+        select:
+          'documentNumber signer title issueDate fileList urgentLevel publisher ',
+      })
+      .populate({
+        path: 'conversation',
+        populate: {
+          path: 'messages',
+          select: 'content sender receiver createdAt -_id',
+          populate: {
+            path: 'sender',
+            select: 'username avatar _id',
+          },
+        },
+      })
+      .select('-__v -createdAt -updatedAt')
+      .lean({ autopopulate: true });
 
-    console.log(updatedDocument);
+    redisQuery.updateRedisValue(
+      `document:${documentId}`,
+      updatedReceiverDocument
+    );
 
     return res.status(200).json({
       message:
