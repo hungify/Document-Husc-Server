@@ -55,6 +55,12 @@ DocumentKHH is a website used to lookup, track, manage, store documents and redu
 
 ### Manual Setup
 
+**Required**
+
+- Node.js
+- Mongodb (local or atlas)
+- Redis (local or redis cloud)
+
 1. Git clone and Open source code via Editor
 2. Create `.env` and the format should be as given in `.env.example`
 3. Generate a self-signed SSL certificate for https, run command below
