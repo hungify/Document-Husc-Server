@@ -12,19 +12,19 @@ const { errorHandler, multerErrorHandler } = require('./middlewares/error');
 const bootServer = () => {
   const app = express();
 
-  app.use(helmet());
-  app.use(xss());
-  app.use(mongoSanitize());
-  app.use(compression());
-  app.use(logger('dev'));
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: false }));
-
-  // app.use(cors(require('../../configs/cors.config')));
-  app.use(cors('*'));
+  app.use([
+    helmet(),
+    xss(),
+    mongoSanitize(),
+    compression(),
+    logger('dev'),
+    express.json(),
+    express.urlencoded({ extended: false }),
+    cors(require('../../configs/cors.config')),
+    multerErrorHandler,
+  ]);
 
   app.use('/api/v1', require('./routes'));
-
   app.get('/', (req, res, next) => {
     return res.status(200).json({
       message:
@@ -32,7 +32,6 @@ const bootServer = () => {
     });
   });
 
-  app.use(multerErrorHandler);
   // catch 404 and forward to error handler
   app.use(function (req, res, next) {
     next(createError(404));

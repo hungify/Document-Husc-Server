@@ -1,4 +1,8 @@
-const whitelist = ['http://localhost:3000', 'https://qlvb.vercel.app'];
+const whitelist = [
+  'http://localhost:3000',
+  'https://localhost:3000',
+  'https://qlvb.vercel.app',
+];
 
 const corsOptions = {
   origin: (origin, callback) => {
