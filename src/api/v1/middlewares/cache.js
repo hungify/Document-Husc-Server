@@ -2,6 +2,8 @@ const CreateError = require('http-errors');
 const { getRedisValue } = require('../../../configs/redis.config');
 const TABS = require('../constants/tabs');
 const { getPayload } = require('./jwt');
+const { listToTree } = require('../utils');
+const _ = require('lodash');
 
 const cacheDocumentDetail = async (req, res, next) => {
   try {
@@ -15,7 +17,6 @@ const cacheDocumentDetail = async (req, res, next) => {
     if (!entryDocument) {
       return next();
     }
-
     if (!tab) {
       // if tab is not defined, return all document details
       const property = {
