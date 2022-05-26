@@ -75,7 +75,7 @@ const cacheDocumentDetail = async (req, res, next) => {
 
     if (payload?.userId) {
       const myUser = participants.find(
-        (p) => p?.receiver?._id.toString() === payload.userId
+        (p) => p?.receiver?._id?.toString() === payload.userId
       );
       myReadDate = myUser?.readDate;
       myConversation = {
