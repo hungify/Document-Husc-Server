@@ -2,6 +2,7 @@ const CreateError = require('http-errors');
 const Document = require('../models/document.model');
 const User = require('../models/user.model');
 const _ = require('lodash');
+const redisQuery = require('../utils/redis');
 
 const getSendDocuments = async (req, res, next) => {
   try {
@@ -136,7 +137,7 @@ const forwardDocument = async (req, res, next) => {
       }
     });
 
-    await Document.updateOne(
+    const updatedDocument = await Document.findOneAndUpdate(
       {
         _id: documentId,
         'participants.$.sender': userId,
@@ -151,8 +152,13 @@ const forwardDocument = async (req, res, next) => {
             })),
           },
         },
+      },
+      {
+        new: true,
       }
     );
+
+    console.log(updatedDocument);
 
     return res.status(200).json({
       message:

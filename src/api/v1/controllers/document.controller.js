@@ -12,7 +12,7 @@ const { isJSON, removeEmptyObjInArrByKeys, listToTree } = require('../utils');
 const _ = require('lodash');
 const { getPayload } = require('../middlewares/jwt');
 const TABS = require('../constants/tabs');
-const { redisClient, setWithTTL } = require('../../../configs/redis.config');
+const redisQuery = require('../utils/redis');
 
 const createDocument = async (req, res, next) => {
   try {
@@ -392,7 +392,11 @@ const getDocumentDetails = async (req, res, next) => {
       .select('-__v -createdAt -updatedAt')
       .lean({ autopopulate: true });
 
-    await setWithTTL(`document:${documentId}`, foundDocument, 60 * 60 * 24);
+    await redisQuery.setWithTTL(
+      `document:${documentId}`,
+      foundDocument,
+      60 * 60 * 24
+    );
 
     if (!foundDocument) {
       throw CreateError.BadRequest(`Document "${documentId}" does not exist`);
