@@ -64,7 +64,7 @@ const getSendDocuments = async (req, res, next) => {
       data: data,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 const forwardDocument = async (req, res, next) => {
@@ -165,7 +165,7 @@ const forwardDocument = async (req, res, next) => {
       dataSuccess: validReceivers,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 

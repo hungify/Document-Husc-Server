@@ -23,9 +23,9 @@ const register = async (req, res, next) => {
     });
   try {
     await userSchema.validateAsync(req.body);
-    next();
+    return next();
   } catch (error) {
-    next(CreateError(error.message));
+    return next(CreateError.BadRequest(error.message));
   }
 };
 
@@ -36,9 +36,9 @@ const login = async (req, res, next) => {
   });
   try {
     await userSchema.validateAsync(req.body);
-    next();
+    return next();
   } catch (error) {
-    next(CreateError(error.message));
+    return next(CreateError(error.message));
   }
 };
 
@@ -48,9 +48,9 @@ const refreshToken = async (req, res, next) => {
   });
   try {
     await refreshTokenSchema.validateAsync(req.body);
-    next();
+    return next();
   } catch (error) {
-    next(CreateError(error.message));
+    return next(CreateError.BadRequest(error.message));
   }
 };
 
@@ -60,9 +60,9 @@ const logout = async (req, res, next) => {
   });
   try {
     await logoutSchema.validateAsync(req.params);
-    next();
+    return next();
   } catch (error) {
-    next(CreateError(error.message));
+    return next(CreateError.BadRequest(error.message));
   }
 };
 

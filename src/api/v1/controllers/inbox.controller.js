@@ -107,7 +107,7 @@ const getInboxDocuments = async (req, res, next) => {
       data: data,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -156,7 +156,7 @@ const updateReadDocument = async (req, res, next) => {
       data: updateReadDocument,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 

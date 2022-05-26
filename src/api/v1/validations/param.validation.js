@@ -17,9 +17,9 @@ const objectId =
     const schema = Joi.object(ids);
     try {
       await schema.validateAsync(req.params);
-      next();
+      return next();
     } catch (error) {
-      next(CreateError.BadRequest(error.message));
+      return next(CreateError.BadRequest(error.message));
     }
   };
 module.exports = {

@@ -5,16 +5,18 @@ const verifyRoles = (...allowedRoles) => {
     const roles = [...allowedRoles];
     if (roles.length > 0) {
       if (req?.payload?.role && roles.includes(req?.payload?.role)) {
-        next();
+        return next();
       } else {
-        next(
+        return next(
           CreateError.Forbidden(
             "You don't have permission to access this resource"
           )
         );
       }
     } else {
-      next(CreateError.BadRequest('Please define some roles in this route'));
+      return next(
+        CreateError.BadRequest('Please define some roles in this route')
+      );
     }
   };
 };
