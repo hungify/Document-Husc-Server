@@ -18,6 +18,7 @@ DocumentKHH is a website used to lookup, track, manage, store documents and redu
 - AWS S3 V3
 - Redis
 - Multer
+- Socket.io
 - Libraries such as Bcryptjs Compression, Helmet, Joi...
   .
 
