@@ -30,4 +30,8 @@ const getRedisValue = (key) => {
   return redisClient.get(key);
 };
 
-module.exports = { redisClient, setWithTTL, getRedisValue };
+const deleteRedisValue = (key) => {
+  return redisClient.del(key);
+};
+
+module.exports = { redisClient, setWithTTL, getRedisValue, deleteRedisValue };
