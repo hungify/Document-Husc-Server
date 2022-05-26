@@ -62,6 +62,10 @@ const login = async (req, res, next) => {
       role: foundUser.role,
     });
 
+    if (!accessToken || !refreshToken) {
+      throw CreateError.InternalServerError('Something went wrong when login');
+    }
+
     return res.status(200).json({
       message: 'success',
       data: {

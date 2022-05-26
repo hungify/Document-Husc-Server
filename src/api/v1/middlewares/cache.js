@@ -1,5 +1,5 @@
 const CreateError = require('http-errors');
-const { getRedisValue } = require('../../../configs/redis.config');
+const redisQuery = require('../utils/redis');
 const TABS = require('../constants/tabs');
 const { getPayload } = require('./jwt');
 const { listToTree } = require('../utils');
@@ -11,7 +11,7 @@ const cacheDocumentDetail = async (req, res, next) => {
     const { tab } = req.query;
     const payload = await getPayload(req);
     const entryDocument = JSON.parse(
-      await getRedisValue(`document:${documentId}`)
+      await redisQuery.getRedisValue(`document:${documentId}`)
     );
 
     if (!entryDocument || tab === TABS.CHAT_ROOM) {
