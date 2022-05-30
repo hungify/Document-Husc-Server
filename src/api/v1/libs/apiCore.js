@@ -1,5 +1,5 @@
-const accents = require('remove-accents');
 const _ = require('lodash');
+const ROLES = require('../../../configs/roles.config');
 
 function filterByReferenceFields(queryObject) {
   const queryShouldBe = { ...queryObject };
@@ -57,17 +57,35 @@ function filterByDateRange(queryObject) {
   return query;
 }
 
-function APICore(queryString, model, userId, type) {
+function APICore(queryString, model, payload, type) {
   this.Model = model; // Model to query
   this.queryString = queryString; // Query string from client
-  this.query = this.Model.find({
-    type: type,
-    isPublic: userId
+  this.query = this.Model.find(
+    payload?.role === ROLES.admin
       ? {
-          $in: [true, false],
+          type: type,
+          isPublic: payload?.userId
+            ? {
+                $in: [true, false],
+              }
+            : true,
         }
-      : true,
-  }); // Query object
+      : {
+          type: type,
+          isPublic: payload?.userId
+            ? {
+                $in: [true, false],
+              }
+            : true,
+          participants: {
+            $elemMatch: {
+              receiver: {
+                $in: [payload?.userId, null],
+              },
+            },
+          },
+        }
+  ); // Query object
 
   this.paginating = () => {
     const page = parseInt(this.queryString.page, 10) || 1;
