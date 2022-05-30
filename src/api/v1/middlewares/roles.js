@@ -2,9 +2,8 @@ const CreateError = require('http-errors');
 
 const verifyRoles = (...allowedRoles) => {
   return (req, res, next) => {
-    const roles = [...allowedRoles];
-    if (roles.length > 0) {
-      if (req?.payload?.role && roles.includes(req?.payload?.role)) {
+    if (allowedRoles.length > 0) {
+      if (req?.payload?.role && allowedRoles.includes(req?.payload?.role)) {
         return next();
       } else {
         return next(
