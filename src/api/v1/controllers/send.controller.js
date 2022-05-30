@@ -190,7 +190,9 @@ const forwardDocument = async (req, res, next) => {
       .select('-__v -createdAt -updatedAt')
       .lean({ autopopulate: true });
 
-    redisQuery.updateRedisValue(
+    delete updatedReceiverDocument.conversation; // conversation is not needed cache
+
+    await redisQuery.updateRedisValue(
       `document:${documentId}`,
       updatedReceiverDocument
     );
