@@ -183,8 +183,13 @@ const updateReadDocument = async (req, res, next) => {
       })
       .select('-__v -createdAt -updatedAt')
       .lean({ autopopulate: true });
+    
+    delete updatedReceiverDocument.conversation; // conversation is not needed cache
 
-    redisQuery.updateRedisValue(`document:${documentId}`, updateReadDocument);
+    await redisQuery.updateRedisValue(
+      `document:${documentId}`,
+      updateReadDocument
+    );
 
     return res.status(200).json({
       message: 'success',

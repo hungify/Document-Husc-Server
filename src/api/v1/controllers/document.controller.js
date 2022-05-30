@@ -304,6 +304,10 @@ const updateDocument = async (req, res, next) => {
       }
     );
 
+    const documentClone = _.cloneDeep(updatedDocument);
+    delete documentClone.conversation; // conversation is not needed cache
+    redisQuery.updateRedisValue(`document:${documentId}`, documentClone);
+
     return res.status(201).json({
       message: 'success',
       data: updatedDocument,
@@ -316,7 +320,7 @@ const updateDocument = async (req, res, next) => {
 const getListDocuments = async (req, res, next) => {
   try {
     const payload = await getPayload(req);
-    const api = new APICore(req.query, Document, payload?.userId, 'official')
+    const api = new APICore(req.query, Document, payload, 'official')
       .paginating()
       .sorting()
       .searching()
@@ -392,9 +396,12 @@ const getDocumentDetails = async (req, res, next) => {
       .select('-__v -createdAt -updatedAt')
       .lean({ autopopulate: true });
 
+    const documentClone = _.cloneDeep(foundDocument);
+    delete documentClone.conversation; // conversation is not needed cache
+
     await redisQuery.setWithTTL(
       `document:${documentId}`,
-      foundDocument,
+      documentClone,
       60 * 60 * 24
     );
 
@@ -608,6 +615,10 @@ const updateRelatedDocuments = async (req, res, next) => {
         new: true,
       }
     ).lean();
+
+    const documentClone = _.cloneDeep(updateRelatedDocuments);
+    delete documentClone.conversation; // conversation is not needed cache
+    redisQuery.updateRedisValue(`document:${documentId}`, documentClone);
 
     return res.status(200).json({
       message: 'success',
