@@ -41,8 +41,8 @@ const userSchema = new mongoose.Schema(
 
 userSchema.pre('save', async function (next) {
   try {
-    const salt = await bcryptjs.genSaltSync(10);
-    const hashedPassword = await bcryptjs.hashSync(this.password, salt);
+    const salt = await bcryptjs.genSalt(10);
+    const hashedPassword = await bcryptjs.hash(this.password, salt);
     this.password = hashedPassword;
     return next();
   } catch (error) {
@@ -52,7 +52,7 @@ userSchema.pre('save', async function (next) {
 
 userSchema.methods.isMatchPassword = async function (password) {
   try {
-    return await bcryptjs.compareSync(password, this.password);
+    return await bcryptjs.compare(password, this.password);
   } catch (error) {
     return next(error);
   }
